@@ -1,0 +1,123 @@
+users Table:
+- Columns:
+  - id: Unique identifier for each user (Primary Key).
+  - username: Name of the user (String, max 50 characters).
+  - password: Password for the user (String, max 700 characters).
+  - role: Role of the user, e.g., 'TestLead' (String, default is 'TestLead').
+
+Relationships:
+- One-to-Many (1 user → many projects)  
+  The id from the users table is referenced by the user_id column in both the project_name, project_details, and testers tables. This means each user can be associated with multiple projects, project details, and testers.
+
+---
+
+project_name Table:
+- Columns:
+  - id: Unique identifier for each project (Primary Key).
+  - project_name: Name of the project (String, max 100 characters).
+  - user_id: ID of the user who manages the project, referencing the id in the users table.
+
+Relationships:
+- One-to-Many (1 project → many project details)  
+  The id of a project in the project_name table is referenced by the project_name_id column in the project_details table, meaning each project can have multiple associated project details.
+
+- One-to-Many (1 project → many testers)  
+  The id of the project is referenced by the project_name_id column in the testers table, meaning a project can have multiple testers.
+
+- One-to-Many (1 project → many metrics records)  
+  The id of the project is referenced by the project_name_id column in the metrics table, meaning a project can have multiple metrics entries.
+
+---
+
+Project Details Table:
+- Columns:
+  - id: Unique identifier for each project detail (Primary Key).
+  - project_name_id: ID of the project, referencing id in the project_name table.
+  - rag: Status of the project (RAG - Red, Amber, Green).
+  - tester_count: Number of testers for the project.
+  - billable: An array of integers representing the count of billable testers.
+  - nonbillable: An array of integers representing the count of non-billable testers.
+  - billing_type: Type of billing (e.g., hourly, fixed).
+  - automation: Automation status (Default 'Nil').
+  - ai_used: AI usage status (Default 'Nil').
+  - rag_details: Additional details regarding the RAG status (Default 'Nil').
+  - user_id: ID of the user who created or manages the project details, referencing id in the users table.
+
+Relationships:
+- Many-to-One (many project details → 1 project)  
+  The project_name_id references the id in the project_name table.
+
+- Many-to-One (many project details → 1 user)  
+  The user_id references the id in the users table.
+
+---
+
+Testers Table:
+- Columns:
+  - id: Unique identifier for each tester (Primary Key).
+  - billable: Boolean value indicating whether the tester is billable (Default FALSE).
+  - tester_name_id: ID of the tester, referencing id in the tester_name table.
+  - project_name_id: ID of the project, referencing id in the project_name table.
+  - user_id: ID of the user, referencing id in the users table.
+
+Relationships:
+- Many-to-One (many testers → 1 project)  
+  The project_name_id references the id in the project_name table, meaning each tester is associated with a single project.
+
+- Many-to-One (many testers → 1 tester name)  
+  The tester_name_id references the id in the tester_name table, indicating that each tester has a specific name.
+
+- Many-to-One (many testers → 1 user)  
+  The user_id references the id in the users table, meaning a user can be associated with multiple testers.
+
+---
+
+Tester Name Table:
+- Columns:
+  - id: Unique identifier for each tester name (Primary Key).
+  - tester_name: Name of the tester (String, max 100 characters).
+  - user_id: ID of the user managing the tester name, referencing id in the users table.
+
+Relationships:
+- One-to-Many (1 tester name → many testers)  
+  The id from the tester_name table is referenced by the tester_name_id in the testers table, meaning each tester name can be associated with multiple testers.
+
+- Many-to-One (many tester names → 1 user)  
+  The user_id references the id in the users table, meaning a user can be associated with multiple tester names.
+
+---
+
+Metrics Table:
+- Columns:
+  - id: Unique identifier for each metrics entry (Primary Key).
+  - month: Month for which the metrics are recorded (String, max 100 characters).
+  - date: Date of the metrics entry (Date).
+  - defectleakage: Metric for defect leakage (Float).
+  - defectdensity: Metric for defect density (Float).
+  - defectremovalefficiency: Metric for defect removal efficiency (Float).
+  - automationcoverage: Metric for automation coverage (Float).
+  - testcasesefficiency: Metric for test case efficiency (Float).
+  - testerproductivity: Metric for tester productivity (Float).
+  - defectseverityindex: Metric for defect severity index (Float).
+  - defectfixrate: Metric for defect fix rate (Float).
+  - defectrejectionratio: Metric for defect rejection ratio (Float).
+  - meantimetofinddefect: Metric for mean time to find a defect (Float).
+  - meantimetorepair: Metric for mean time to repair (Float).
+  - project_name_id: ID of the project, referencing id in the project_name table.
+  - user_id: ID of the user who recorded the metrics, referencing id in the users table.
+
+Relationships:
+- Many-to-One (many metrics → 1 project)  
+  The project_name_id references the id in the project_name table, meaning each metric entry belongs to a specific project.
+
+- Many-to-One (many metrics → 1 user)  
+  The user_id references the id in the users table, meaning each metric entry is recorded by a specific user.
+
+---
+
+Sample Use Case for Project "sixdata":
+- If a user asks for details about the "sixdata" project, it can be mapped to the project_name table where project_name = 'sixdata'. 
+- The relationships with other tables can then be queried:
+  - Project Details: Retrieve information related to the project’s status, tester counts, billing type, automation details, etc., from the project_details table, where project_name_id matches the id of "sixdata".
+  - Testers: Get all testers associated with the "sixdata" project, using the testers table where project_name_id matches "sixdata" and further filtering by tester_name_id and user_id.
+  - Metrics: Fetch all metrics related to the "sixdata" project for the current or specific month using the metrics table where project_name_id matches "sixdata".

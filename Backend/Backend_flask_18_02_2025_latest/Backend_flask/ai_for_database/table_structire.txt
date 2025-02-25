@@ -1,0 +1,238 @@
+users: id, username, password, role
+project_name: id, project_name, user_id
+project_details: id, project_name_id, rag, tester_count, billable, nonbillable, billing_type, automation, ai_used, rag_details, user_id
+testers: id, billable, tester_name_id, project_name_id, user_id
+tester_name: id, tester_name, user_id
+new_defects: id, date, month, regression_defect, functional_defect, defect_reopened, uat_defect, project_name_id, user_id
+test_execution_status: id, month, date, total_execution, tc_execution, pass_count, fail_count, no_run, blocked, project_name_id, user_id
+total_defect_status: id, month, date, total_defect, defect_closed, open_defect, critical, high, medium, low, project_name_id, user_id
+build_status: id, month, date, total_build_received, builds_accepted, builds_rejected, project_name_id, user_id
+defect_accepted_rejected: id, month, date, total_defects, dev_team_accepted, dev_team_rejected, project_name_id, user_id
+test_case_creation_status: id, month, date, total_test_case_created, test_case_approved, test_case_rejected, project_name_id, user_id
+
+
+# User Table:
+- The 'users' table stores user data.
+- Each user has a unique identifier (`id`).
+- A user can have multiple projects, project details, testers, and tester names.
+- Each relationship links to other tables: 
+  - projects (one-to-many)
+  - project_details (one-to-many)
+  - testers (one-to-many)
+  - tester_names (one-to-many)
+
+# Project Table:
+- The 'project_name' table stores project data.
+- Each project has a unique identifier (`id`).
+- A project is associated with one user (foreign key `user_id`).
+- A project can have multiple project details, testers, new defects, test execution statuses, total defect statuses, build statuses, defect accepted/rejected records, and test case creation statuses (all one-to-many relationships).
+- Relationship to User (one-to-many): Each project is linked to a user.
+
+# Project Details Table:
+- The 'project_details' table stores information related to each project detail.
+- Each project detail is linked to a single project and a single user.
+- Relationship to Project (many-to-one): Each project detail belongs to one project.
+- Relationship to User (many-to-one): Each project detail is associated with one user.
+
+# Tester Table:
+- The 'testers' table stores data about testers.
+- Each tester is associated with one project, one user, and one tester name.
+- Relationship to Project (many-to-one): Each tester belongs to one project.
+- Relationship to User (many-to-one): Each tester is linked to one user.
+- Relationship to Tester Name (many-to-one): Each tester is linked to one tester name.
+
+# Tester Name Table:
+- The 'tester_name' table stores the names of testers.
+- Each tester name is associated with one user.
+- Relationship to User (many-to-one): Each tester name belongs to one user.
+- Relationship to Tester (one-to-many): Each tester name can be linked to multiple testers.
+
+### Key Relationships:
+1. **User to Projects**: A user can have multiple projects.
+2. **Project to Project Details**: A project can have multiple project details.
+3. **User to Project Details**: Each project detail belongs to a single user.
+4. **Project to Testers**: A project can have multiple testers.
+5. **User to Testers**: A user can have multiple testers.
+6. **Tester to Tester Name**: Each tester is associated with one tester name.
+
+This structure allows for understanding of the columns and their relationships. Each relationship defines how one table relates to another, ensuring proper organization of data across different entities like users, projects, testers, and tester names.
+
+
+
+
+---------------------new one -------------------------
+
+
+
+New_defects Table:
+- id: Integer, Primary Key, Auto-increment
+- date: Date, Date of the defect record
+- month: String(100), Month of the record
+- regression_defect: Integer, Count of regression defects
+- functional_defect: Integer, Count of functional defects
+- defect_reopened: Integer, Count of reopened defects
+- uat_defect: Integer, Count of UAT defects
+- project_name_id: Integer, Foreign Key referencing Project_name.id
+- user_id: Integer, Foreign Key referencing Users.id
+
+Test_execution_status Table:
+- id: Integer, Primary Key, Auto-increment
+- month: String(100), Month of the test execution record
+- date: Date, Date of the test execution record
+- total_execution: Integer, Total test executions
+- tc_execution: Integer, Total test cases executed
+- pass_count: Integer, Number of test cases passed
+- fail_count: Integer, Number of test cases failed
+- no_run: Integer, Number of test cases not run
+- blocked: Integer, Number of test cases blocked
+- project_name_id: Integer, Foreign Key referencing Project_name.id
+- user_id: Integer, Foreign Key referencing Users.id
+
+Total_Defect_Status Table:
+- id: Integer, Primary Key, Auto-increment
+- month: String(100), Month of the defect status record
+- date: Date, Date of the defect status record
+- total_defect: Integer, Total defect count
+- defect_closed: Integer, Count of defects closed
+- open_defect: Integer, Count of open defects
+- critical: Integer, Count of critical defects
+- high: Integer, Count of high severity defects
+- medium: Integer, Count of medium severity defects
+- low: Integer, Count of low severity defects
+- project_name_id: Integer, Foreign Key referencing Project_name.id
+- user_id: Integer, Foreign Key referencing Users.id
+
+BuildStatus Table:
+- id: Integer, Primary Key, Auto-increment
+- month: String(100), Month of the build status record
+- date: Date, Date of the build status record
+- total_build_received: Integer, Total builds received
+- builds_accepted: Integer, Number of accepted builds
+- builds_rejected: Integer, Number of rejected builds
+- project_name_id: Integer, Foreign Key referencing Project_name.id
+- user_id: Integer, Foreign Key referencing Users.id
+
+DefectAcceptedRejected Table:
+- id: Integer, Primary Key, Auto-increment
+- month: String(100), Month of the defect acceptance/rejection record
+- date: Date, Date of the defect record
+- total_defects: Integer, Total defects count
+- dev_team_accepted: Integer, Number of defects accepted by the dev team
+- dev_team_rejected: Integer, Number of defects rejected by the dev team
+- project_name_id: Integer, Foreign Key referencing Project_name.id
+- user_id: Integer, Foreign Key referencing Users.id
+
+TestCaseCreationStatus Table:
+- id: Integer, Primary Key, Auto-increment
+- month: String(100), Month of the test case creation status record
+- date: Date, Date of the record
+- total_test_case_created: Integer, Number of test cases created
+- test_case_approved: Integer, Number of test cases approved
+- test_case_rejected: Integer, Number of test cases rejected
+- project_name_id: Integer, Foreign Key referencing Project_name.id
+- user_id: Integer, Foreign Key referencing Users.id
+
+
+
+
+
+
+
+
+------------------------------------working description for code ------------------------------------------------
+
+
+
+1. users Table:
+- id (INTEGER PRIMARY KEY AUTOINCREMENT)
+- username (STRING(50) NOT NULL)
+- password (STRING(700) NOT NULL)
+- role (STRING(50) DEFAULT 'TestLead')
+
+2. project_name Table:
+- id (INTEGER PRIMARY KEY AUTOINCREMENT)
+- project_name (STRING(100) NOT NULL)
+- user_id (INTEGER FOREIGN KEY REFERENCES users(id) NOT NULL)
+
+3. project_details Table:
+- id (INTEGER PRIMARY KEY AUTOINCREMENT)
+- project_name_id (INTEGER FOREIGN KEY REFERENCES project_name(id) NOT NULL)
+- rag (STRING(100) NOT NULL)
+- tester_count (INTEGER NOT NULL)
+- billable (ARRAY(INTEGER) NOT NULL)
+- nonbillable (ARRAY(INTEGER) NOT NULL)
+- billing_type (STRING(100) NOT NULL)
+- automation (STRING(100) DEFAULT 'Nil')
+- ai_used (STRING(100) DEFAULT 'Nil')
+- rag_details (STRING(100) DEFAULT 'Nil')
+- user_id (INTEGER FOREIGN KEY REFERENCES users(id) NOT NULL)
+
+4. testers Table:
+- id (INTEGER PRIMARY KEY AUTOINCREMENT)
+- billable (BOOLEAN DEFAULT FALSE)
+- tester_name_id (INTEGER FOREIGN KEY REFERENCES tester_name(id) NOT NULL)
+- project_name_id (INTEGER FOREIGN KEY REFERENCES project_name(id) NOT NULL)
+- user_id (INTEGER FOREIGN KEY REFERENCES users(id) NOT NULL)
+
+5. tester_name Table:
+- id (INTEGER PRIMARY KEY AUTOINCREMENT)
+- tester_name (STRING(100) NOT NULL)
+- user_id (INTEGER FOREIGN KEY REFERENCES users(id) NOT NULL)
+
+6. metrics Table:
+- id (INTEGER PRIMARY KEY AUTOINCREMENT)
+- month (STRING(100) NOT NULL)
+- date (DATE NOT NULL)
+- defectleakage (FLOAT NOT NULL)
+- defectdensity (FLOAT NOT NULL)
+- defectremovalefficiency (FLOAT NOT NULL)
+- automationcoverage (FLOAT NOT NULL)
+- testcasesefficiency (FLOAT NOT NULL)
+- testerproductivity (FLOAT NOT NULL)
+- defectseverityindex (FLOAT NOT NULL)
+- defectfixrate (FLOAT NOT NULL)
+- defectrejectionratio (FLOAT NOT NULL)
+- meantimetofinddefect (FLOAT NOT NULL)
+- meantimetorepair (FLOAT NOT NULL)
+- project_name_id (INTEGER FOREIGN KEY REFERENCES project_name(id) NOT NULL)
+- user_id (INTEGER FOREIGN KEY REFERENCES users(id) NOT NULL)
+
+---
+
+Relationships:
+
+1. `project_name` ↔ `project_details`
+- One-to-Many (1 project → many project details)
+- `project_name_id` in `project_details` references `id` in `project_name`
+
+2. `project_name` ↔ `testers`
+- One-to-Many (1 project → many testers)
+- `project_name_id` in `testers` references `id` in `project_name`
+
+3. `tester_name` ↔ `testers`
+- One-to-Many (1 tester_name → many testers)
+- `tester_name_id` in `testers` references `id` in `tester_name`
+
+4. `users` ↔ `project_name`
+- One-to-Many (1 user → many projects)
+- `user_id` in `project_name` references `id` in `users`
+
+5. `users` ↔ `project_details`
+- One-to-Many (1 user → many project details)
+- `user_id` in `project_details` references `id` in `users`
+
+6. `users` ↔ `testers`
+- One-to-Many (1 user → many testers)
+- `user_id` in `testers` references `id` in `users`
+
+7. `project_name` ↔ `metrics`
+- One-to-Many (1 project → many metrics entries)
+- `project_name_id` in `metrics` references `id` in `project_name`
+
+8. `users` ↔ `metrics`
+- One-to-Many (1 user → many metrics records)
+- `user_id` in `metrics` references `id` in `users`
+
+
+
+all the columns and table are lowercase 

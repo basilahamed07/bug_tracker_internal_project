@@ -1,0 +1,47 @@
+
+/* Pop-up styles */
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Ensure it appears above other elements */
+  }
+  
+  .popup {
+    background-color: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    max-width: 400px; /* Limit width of pop-up */
+    width: 90%; /* Responsive width */
+  }
+  
+  .popup h3 {
+    margin-bottom: 10px;
+    color: #000435; /* Header color for consistency */
+  }
+  
+  .popup p {
+    margin-bottom: 20px; /* Space below paragraph */
+  }
+  
+  .popup button {
+    background-color: #000435; /* Primary button color for pop-up */
+    color: white; /* Text color */
+    border: none; /* No border */
+    padding: 10px 15px; /* Padding for button */
+    border-radius: 5px; /* Consistent border radius */
+    cursor: pointer; /* Pointer cursor */
+  }
+  
+  .popup button:hover {
+    background-color: #004080; /* Darker shade on hover */
+  }
+  

@@ -1,0 +1,71 @@
+/* Modal.css */
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Ensure it sits on top of everything else */
+  }
+  
+  .modal-content {
+    background: white;
+    padding: 15px 25px; /* Reduced padding to make it more compact */
+    border-radius: 8px; /* Slightly reduced border radius */
+    width: 320px; /* Reduced width for smaller modal */
+    max-width: 90vw; /* Allow modal to scale on smaller screens */
+    max-height: 80vh;
+    overflow-y: auto; /* Enables scrolling inside the modal if the content exceeds the max height */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Adds a slight shadow to the modal */
+    z-index: 1001; /* Modal content is above the overlay */
+  }
+  
+  .modal-header {
+    background-color: #003366; /* Dark blue color for header */
+    color: white;
+    padding: 8px 15px; /* Reduced padding for the header */
+    border-radius: 8px 8px 0 0; /* Rounded top corners */
+  }
+  
+  .generate-report-btn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 8px 16px; /* Adjusted padding */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .generate-report-btn:disabled {
+    background-color: #cccccc; /* Disabled state for the button */
+  }
+  
+  .close-btn {
+    background-color: #f44336;
+    color: white;
+    padding: 8px 16px; /* Adjusted padding */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 12px; /* Slightly adjusted top margin */
+  }
+  
+  .error {
+    color: red;
+    font-size: 14px;
+    margin-top: 12px; /* Increased margin for better spacing */
+  }
+  
+  select {
+    width: 100%;
+    padding: 8px 12px; /* Adjusted padding for better spacing */
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    margin-bottom: 16px; /* Adjusted margin for consistency */
+  }
+  

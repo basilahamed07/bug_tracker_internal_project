@@ -1,0 +1,256 @@
+{
+    "project_details": [
+        {
+            "rag": "green\n",
+            "rag_details": "somting used here",
+            "ai_used": "yes used",
+            "automation": "Soming used",
+            "billable": [
+                2
+            ],
+            "billing_type": "T@M",
+            "id": 1,
+            "nonbillable": [
+                1
+            ],
+            "project_name_id": 1,
+            "tester_count": 3,
+            "user_id": 3
+        },
+        {
+            "rag": "Green",
+            "rag_details": "Project is on track and progressing well.",
+            "ai_used": "false",
+            "automation": "false",
+            "billable": [
+                1,
+                4
+            ],
+            "billing_type": "t@m",
+            "id": 2,
+            "nonbillable": [
+                3
+            ],
+            "project_name_id": 3,
+            "tester_count": 5,
+            "user_id": 3
+        },
+        {
+            "rag": "Green",
+            "rag_details": "Project is on track and progressing well.",
+            "ai_used": "false",
+            "automation": "false",
+            "billable": [],
+            "billing_type": "t@m",
+            "id": 3,
+            "nonbillable": [
+                5
+            ],
+            "project_name_id": 3,
+            "tester_count": 5,
+            "user_id": 3
+        },
+        {
+            "rag": "Green",
+            "rag_details": "",
+            "ai_used": "true",
+            "automation": "true",
+            "billable": [
+                5,
+                3,
+                11
+            ],
+            "billing_type": "",
+            "id": 5,
+            "nonbillable": [
+                4,
+                1,
+                14
+            ],
+            "project_name_id": 60,
+            "tester_count": 6,
+            "user_id": 3
+        },
+        {
+            "rag": "Green",
+            "rag_details": "",
+            "ai_used": "true",
+            "automation": "true",
+            "billable": [
+                5,
+                3,
+                11
+            ],
+            "billing_type": "",
+            "id": 6,
+            "nonbillable": [
+                4,
+                1,
+                14
+            ],
+            "project_name_id": 60,
+            "tester_count": 6,
+            "user_id": 3
+        },
+        {
+            "rag": "Red",
+            "rag_details": "Red Red Red",
+            "ai_used": "true",
+            "automation": "true",
+            "billable": [
+                11,
+                14
+            ],
+            "billing_type": "Hourly",
+            "id": 7,
+            "nonbillable": [
+                1,
+                5
+            ],
+            "project_name_id": 61,
+            "tester_count": 4,
+            "user_id": 3
+        },
+        {
+            "rag": "Red",
+            "rag_details": "Red Red Red",
+            "ai_used": "Something used",
+            "automation": "Something used",
+            "billable": [
+                11,
+                14
+            ],
+            "billing_type": "Hourly",
+            "id": 8,
+            "nonbillable": [
+                1,
+                5
+            ],
+            "project_name_id": 61,
+            "tester_count": 4,
+            "user_id": 3
+        },
+        {
+            "rag": "Red",
+            "rag_details": "Red Red Red",
+            "ai_used": "sadsad",
+            "automation": "asdsa",
+            "billable": [
+                4
+            ],
+            "billing_type": "Hourly",
+            "id": 9,
+            "nonbillable": [
+                3
+            ],
+            "project_name_id": 62,
+            "tester_count": 2,
+            "user_id": 3
+        },
+        {
+            "rag": "Red",
+            "rag_details": "Red Red Red",
+            "ai_used": "sadsad",
+            "automation": "asdsa",
+            "billable": [
+                4
+            ],
+            "billing_type": "Hourly",
+            "id": 10,
+            "nonbillable": [
+                3
+            ],
+            "project_name_id": 62,
+            "tester_count": 2,
+            "user_id": 3
+        },
+        {
+            "rag": "Red",
+            "rag_details": "Red Red Red",
+            "ai_used": "dadsda",
+            "automation": "asdsad",
+            "billable": [
+                3
+            ],
+            "billing_type": "Hourly",
+            "id": 11,
+            "nonbillable": [
+                4
+            ],
+            "project_name_id": 63,
+            "tester_count": 2,
+            "user_id": 3
+        },
+        {
+            "rag": "Green",
+            "rag_details": "",
+            "ai_used": "csdcsdcsdc",
+            "automation": "dsfdscsdc",
+            "billable": [
+                29
+            ],
+            "billing_type": "",
+            "id": 12,
+            "nonbillable": [
+                28
+            ],
+            "project_name_id": 69,
+            "tester_count": 2,
+            "user_id": 3
+        },
+        {
+            "rag": "Green",
+            "rag_details": "",
+            "ai_used": "All the best",
+            "automation": "All the best",
+            "billable": [
+                27,
+                38
+            ],
+            "billing_type": "",
+            "id": 13,
+            "nonbillable": [
+                30,
+                40
+            ],
+            "project_name_id": 70,
+            "tester_count": 4,
+            "user_id": 3
+        },
+        {
+            "rag": "Green",
+            "rag_details": "",
+            "ai_used": "asdsadsad",
+            "automation": "assadsad",
+            "billable": [
+                29
+            ],
+            "billing_type": "",
+            "id": 14,
+            "nonbillable": [
+                27
+            ],
+            "project_name_id": 72,
+            "tester_count": 2,
+            "user_id": 3
+        },
+        {
+            "rag": "Green",
+            "rag_details": "",
+            "ai_used": "Dhanexh",
+            "automation": "Dhanexh",
+            "billable": [
+                38
+            ],
+            "billing_type": "",
+            "id": 15,
+            "nonbillable": [
+                44
+            ],
+            "project_name_id": 73,
+            "tester_count": 2,
+            "user_id": 3
+        }
+    ],
+    "project_name": "SIX_data"
+}

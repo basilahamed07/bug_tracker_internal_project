@@ -1,0 +1,22 @@
+table if = Total_Defect_Status (completed)
+defect_closed
+open_defect
+
+table of = DefectAcceptedRejected (completed)
+dev_team_rejected
+total_defects
+
+table of = Total_Defect_Status (completed)
+critical
+high
+medium
+low
+
+table of =Test_execution_status
+tc_execution
+total_execution
+
+table = New_defects 
+uat_defect
+
+
