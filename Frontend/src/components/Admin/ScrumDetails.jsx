@@ -11,42 +11,62 @@ const ScrumDetails = () => {
     const navigate = useNavigate();
     const [error, setError] = useState(null);
     const project_name_id = sessionStorage.getItem('project_name_id');
+    const [billableData, setBillableData] = useState({});
 
     // Pagination state
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 3; // Number of items per page
 
-    const [showPIModal, setShowPIModal] = useState(false);
-    const [selectedScrum, setSelectedScrum] = useState(null);
-    const [piList, setPIList] = useState([]);
-    const [selectedPI, setSelectedPI] = useState('');
-    const [showCreatePIForm, setShowCreatePIForm] = useState(false);
-    const [newPIName, setNewPIName] = useState('');
-
     useEffect(() => {
-        const fetchScrumDetails = async () => {
+        const fetchData = async () => {
             try {
                 const token = sessionStorage.getItem('access_token');
-                const response = await axios.get(`https://frt4cnbr-5000.inc1.devtunnels.ms/agile_details/${project_name_id}`, {
+                
+                // Fetch scrum details
+                const scrumResponse = await axios.get(
+                  `https://frt4cnbr-5000.inc1.devtunnels.ms/agile_details/${project_name_id}`,
+                  {
                     headers: {
-                        Authorization: `Bearer ${token}`,
-                        'Content-Type': 'application/json',
+                      Authorization: `Bearer ${token}`,
+                      'Content-Type': 'application/json',
                     }
-                });
-                if (response.status !== 200) {
-                    throw new Error('Failed to fetch data');
-                }
+                  }
+                );
+        
+                setScrumDetails(scrumResponse.data);
+                setProjectName(scrumResponse.data[0]?.project_name);
+        
+                // Fetch billable status with updated handling
+                const billableResponse = await axios.get(
+                  `https://frt4cnbr-5000.inc1.devtunnels.ms/project-base-billable/${project_name_id}`,
+                  {
+                    headers: {
+                      Authorization: `Bearer ${token}`,
+                      'Content-Type': 'application/json',
+                    }
+                  }
+                );
 
-                setScrumDetails(response.data);
-                setProjectName(response.data[0].project_name);
-                setIsLoading(false);
+                // Create a map using tester_name instead of id
+                const billableMap = {};
+                if (billableResponse.data && billableResponse.data.tester_info) {
+                    billableResponse.data.tester_info.forEach(tester => {
+                        billableMap[tester.tester_name] = tester.billable;
+                    });
+                }
+                
+                setBillableData(billableMap);
+                console.log('Billable Data:', billableMap);
+                console.log('Scrum Details:', scrumResponse.data);
+        
             } catch (error) {
                 setError(error.message);
+            } finally {
                 setIsLoading(false);
             }
         };
 
-        fetchScrumDetails();
+        fetchData();
     }, [project_name_id]);
 
     // Logic for pagination
@@ -56,41 +76,17 @@ const ScrumDetails = () => {
 
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-    // Function to fetch PIs for selected scrum
-    const fetchPIs = async (scrumId) => {
-        try {
-            const token = sessionStorage.getItem('access_token');
-            const response = await axios.get(`https://frt4cnbr-5000.inc1.devtunnels.ms/get_pl_name/${scrumId}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    'Content-Type': 'application/json',
-                }
-            });
-            setPIList(response.data);
-        } catch (error) {
-            console.error('Error fetching PIs:', error);
-        }
+    // Modified handleScrumClick - simplified to just store scrum ID and navigate
+    const handleScrumClick = (scrum) => {
+        sessionStorage.setItem('screamId', scrum.id);
+        navigate('/ManagerView/SprintDetailsTable');
     };
 
-    // Handle scrum card click
-    const handleScrumClick = async (scrum) => {
-        setSelectedScrum(scrum);
-        await fetchPIs(scrum.id);
-        setShowPIModal(true);
-    };
-
-    // Modified handlePISubmit
-    const handlePISubmit = () => {
-        if (!selectedPI && !newPIName) {
-            alert('Please either select an existing PI or create a new one');
-            return;
-        }
-
-        const piNameToUse = selectedPI || newPIName;
-        sessionStorage.setItem('screamId', selectedScrum.id);
-        sessionStorage.setItem('piName', piNameToUse);
-        navigate(`/ManagerView/SprintDetailsTable?team=${selectedScrum.scream_name}`);
-        setShowPIModal(false);
+    // Add function to calculate total experience
+    const calculateTotalExp = (priorExp, cptExp) => {
+        const prior = parseFloat(priorExp) || 0;
+        const cpt = parseFloat(cptExp) || 0;
+        return (prior + cpt).toFixed(1); // Round to 1 decimal place
     };
 
     if (isLoading) {
@@ -104,7 +100,7 @@ const ScrumDetails = () => {
     return (
         <div className="container mt-4">
             <h2 className="text-center" style={{ color: "#000d6b" }}>
-                Scrum Details - {projectName} {/* Display the project name here */}
+                Project Information - {projectName} {/* Display the project name here */}
             </h2>
 
             <div className="team-cards-container d-flex justify-content-center mb-4">
@@ -126,80 +122,6 @@ const ScrumDetails = () => {
                 ))}
             </div>
 
-            {/* PI Selection Modal */}
-            <Modal show={showPIModal} onHide={() => setShowPIModal(false)}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Select Program Increment (PI)</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <Form>
-                        {piList.length > 0 && (
-                            <Form.Group className="mb-3">
-                                <Form.Label>Select Existing PI</Form.Label>
-                                <Form.Select
-                                    value={selectedPI}
-                                    onChange={(e) => {
-                                        setSelectedPI(e.target.value);
-                                        setShowCreatePIForm(false);
-                                    }}
-                                >
-                                    <option value="">Select PI</option>
-                                    {piList.map((pi, index) => (
-                                        <option key={index} value={pi}>
-                                            {pi}
-                                        </option>
-                                    ))}
-                                </Form.Select>
-                            </Form.Group>
-                        )}
-
-                        {/* <div className="text-center my-3">
-                            <span
-                                onClick={() => {
-                                    setShowCreatePIForm(true);
-                                    setSelectedPI('');
-                                }}
-                                style={{
-                                    color: '#000d6b',
-                                    cursor: 'pointer',
-                                    padding: '6px 12px',
-                                    display: 'inline-block'
-                                }}
-                            >
-                                Create New PI
-                            </span>
-                        </div> */}
-
-                        {showCreatePIForm && (
-                            <Form.Group className="mb-3">
-                                <Form.Label>New PI Name</Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    placeholder="Enter new PI name"
-                                    value={newPIName}
-                                    onChange={(e) => setNewPIName(e.target.value)}
-                                />
-                            </Form.Group>
-                        )}
-                    </Form>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={() => setShowPIModal(false)}>
-                        Close
-                    </Button>
-                    <Button 
-                        variant="primary" 
-                        onClick={handlePISubmit}
-                        style={{
-                            backgroundColor: '#000d6b',
-                            borderColor: '#000d6b'
-                        }}
-                    >
-                        Proceed
-                    </Button>
-                </Modal.Footer>
-            </Modal>
-
             <div className="card">
                 <div className="card-header" style={{ backgroundColor: '#000d6b', color: 'white' }}>
                     <h5>Scrum Members</h5>
@@ -214,48 +136,69 @@ const ScrumDetails = () => {
                                 <th>CPT EXP</th>
                                 <th>TOTAL EXP</th>
                                 <th>SKILLS</th>
+                                <th>BILLABLE STATUS</th> {/* New column */}
                             </tr>
                         </thead>
                         <tbody>
-                            {currentScrums.map((scrum, index) => (
-                                <tr key={index}>
-                                    <td>{scrum.tester_name}</td>
-                                    <td>{new Date(scrum.join_date).toLocaleDateString()}</td>
-                                    <td>{scrum.total_experience}</td>
-                                    <td>{scrum.total_experience}</td> {/* Replace with actual CPT Experience if different */}
-                                    <td>{scrum.total_experience}</td> {/* Replace with actual Total Experience if different */}
-                                    <td>
-                                        {scrum.skillset.map((skill, i) => (
-                                            <span key={i} className="badge bg-info text-dark me-1">{skill}</span>
-                                        ))}
-                                    </td>
-                                </tr>
-                            ))}
+                            {currentScrums.map((scrum, index) => {
+                                console.log('Scrum:', scrum);
+                                console.log('Billable status for ID:', scrum.id, billableData[scrum.tester_name]);
+                                
+                                // Calculate total experience
+                                const totalExp = calculateTotalExp(scrum.total_experience, scrum.total_experience);
+                                
+                                return (
+                                    <tr key={index}>
+                                        <td>{scrum.tester_name}</td>
+                                        <td>{new Date(scrum.join_date).toLocaleDateString()}</td>
+                                        <td>{scrum.total_experience}</td> {/* Prior Experience */}
+                                        <td>{scrum.total_experience}</td> {/* CPT Experience */}
+                                        <td>{totalExp}</td> {/* Total Experience (Prior + CPT) */}
+                                        <td>
+                                            {scrum.skillset.map((skill, i) => (
+                                                <span key={i} className="badge bg-info text-dark me-1">{skill}</span>
+                                            ))}
+                                        </td>
+                                        <td>
+                                            <span 
+                                                className={`badge ${billableData[scrum.tester_name] ? 'bg-success' : 'bg-warning'}`}
+                                                style={{ fontSize: '0.9em' }}
+                                            >
+                                                {billableData[scrum.tester_name] ? 'Billable' : 'Non-Billable'}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                );
+                            })}
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            {/* Pagination Controls */}
-            <div className="pagination-container d-flex justify-content-center mt-3">
-                <button
-                    className="btn btn-primary mx-2"
-                    style={{backgroundColor: '#000d6b' , color: 'white'}}
-                    onClick={() => paginate(currentPage - 1)}
-                    disabled={currentPage === 1}
-                >
-                    Previous
-                </button>
-                <span className="mt-2">Page {currentPage}</span>
-                <button
-                    className="btn btn-primary mx-2"
-                    onClick={() => paginate(currentPage + 1)}
-                    style={{backgroundColor: '#000d6b' , color: 'white'}}
-                    disabled={currentPage * itemsPerPage >= scrumDetails.length}
-                >
-                    Next
-                </button>
-            </div>
+            {/* Modified Pagination Controls - Only show if there's more than one page */}
+            {scrumDetails.length > itemsPerPage && (
+                <div className="pagination-container d-flex justify-content-center mt-3">
+                    {currentPage > 1 && (
+                        <button
+                            className="btn btn-primary mx-2"
+                            style={{backgroundColor: '#000d6b', color: 'white'}}
+                            onClick={() => paginate(currentPage - 1)}
+                        >
+                            Previous
+                        </button>
+                    )}
+                    <span className="mt-2">Page {currentPage}</span>
+                    {currentPage * itemsPerPage < scrumDetails.length && (
+                        <button
+                            className="btn btn-primary mx-2"
+                            style={{backgroundColor: '#000d6b', color: 'white'}}
+                            onClick={() => paginate(currentPage + 1)}
+                        >
+                            Next
+                        </button>
+                    )}
+                </div>
+            )}
         </div>
     );
 };

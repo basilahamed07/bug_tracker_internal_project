@@ -14,6 +14,13 @@ const SprintDetailsTable = () => {
   const [selectedPI, setSelectedPI] = useState('');
   const navigate = useNavigate();
 
+  // Add new states for PI handling
+  const [piList, setPIList] = useState([]);
+  const [showPIModal, setShowPIModal] = useState(false);
+  const [showCreatePIForm, setShowCreatePIForm] = useState(false);
+  const [newPIName, setNewPIName] = useState('');
+  const [currentSprint, setCurrentSprint] = useState(null);
+
   useEffect(() => {
     const fetchUserRole = async () => {
       try {
@@ -49,43 +56,88 @@ const SprintDetailsTable = () => {
     });
   };
 
-  useEffect(() => {
-    const fetchSprintDetails = async () => {
-      try {
-        const agileId = sessionStorage.getItem('screamId');
-        const piName = sessionStorage.getItem('piName');
-        const token = sessionStorage.getItem('access_token');
+  // Add new function to find PI with current sprint
+  const findCurrentPI = async (pis, scrumId, token) => {
+    for (const pi of pis) {
+      const sprintsResponse = await fetch(
+        `https://frt4cnbr-5000.inc1.devtunnels.ms/sprint_details/${scrumId}/${pi}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        }
+      );
 
-        if (!agileId || !token || !piName) {
+      if (sprintsResponse.ok) {
+        const sprintsData = await sprintsResponse.json();
+        const currentSprint = findCurrentSprint(sprintsData);
+        if (currentSprint) {
+          return { pi, sprints: sprintsData, currentSprint };
+        }
+      }
+    }
+    return null;
+  };
+
+  useEffect(() => {
+    const fetchPIAndSprints = async () => {
+      try {
+        const token = sessionStorage.getItem('access_token');
+        const scrumId = sessionStorage.getItem('screamId');
+
+        if (!token || !scrumId) {
           setError('Missing required session data');
-          setLoading(false);
           return;
         }
 
-        setSelectedPI(piName);
-
-        const response = await fetch(
-          `https://frt4cnbr-5000.inc1.devtunnels.ms/sprint_details/${agileId}/${piName}`,
+        // Fetch PIs first
+        const piResponse = await fetch(
+          `https://frt4cnbr-5000.inc1.devtunnels.ms/get_pl_name/${scrumId}`,
           {
-            method: 'GET',
             headers: {
               'Authorization': `Bearer ${token}`,
             },
           }
         );
 
-        if (!response.ok) throw new Error('Failed to fetch data');
+        if (!piResponse.ok) throw new Error('Failed to fetch PIs');
+        const pis = await piResponse.json();
+        setPIList(pis);
 
-        const data = await response.json();
-        setSprintDetails(data);
+        if (pis.length > 0) {
+          // Find PI with current sprint
+          const currentPIData = await findCurrentPI(pis, scrumId, token);
 
-        // Find current sprint and set it as selected
-        const currentSprint = findCurrentSprint(data);
-        if (currentSprint) {
-          setSelectedSprint(currentSprint.sprint_name);
-        } else if (data.length > 0) {
-          // If no current sprint, default to first sprint
-          setSelectedSprint(data[0].sprint_name);
+          if (currentPIData) {
+            // Current sprint found in one of the PIs
+            setSelectedPI(currentPIData.pi);
+            setSprintDetails(currentPIData.sprints);
+            setSelectedSprint(currentPIData.currentSprint.sprint_name);
+            setCurrentSprint(currentPIData.currentSprint);
+          } else {
+            // No current sprint found, default to latest PI
+            const latestPI = pis[pis.length - 1];
+            setSelectedPI(latestPI);
+            
+            // Fetch sprints for latest PI
+            const sprintsResponse = await fetch(
+              `https://frt4cnbr-5000.inc1.devtunnels.ms/sprint_details/${scrumId}/${latestPI}`,
+              {
+                headers: {
+                  'Authorization': `Bearer ${token}`,
+                },
+              }
+            );
+
+            if (sprintsResponse.ok) {
+              const sprintsData = await sprintsResponse.json();
+              setSprintDetails(sprintsData);
+              if (sprintsData.length > 0) {
+                setSelectedSprint(sprintsData[0].sprint_name);
+                setCurrentSprint(sprintsData[0]);
+              }
+            }
+          }
         }
       } catch (error) {
         setError(error.message);
@@ -94,7 +146,7 @@ const SprintDetailsTable = () => {
       }
     };
 
-    fetchSprintDetails();
+    fetchPIAndSprints();
   }, []);
 
   const handleEditClick = (story) => {
@@ -214,11 +266,56 @@ const SprintDetailsTable = () => {
     setEditedStory({ ...editedStory, [name]: value });
   };
 
+  // Add handler for PI change
+  const handlePIChange = async (newPI) => {
+    try {
+      const token = sessionStorage.getItem('access_token');
+      const scrumId = sessionStorage.getItem('screamId');
+      
+      setSelectedPI(newPI);
+      sessionStorage.setItem('piName', newPI);
+      setLoading(true);
+
+      const response = await fetch(
+        `https://frt4cnbr-5000.inc1.devtunnels.ms/sprint_details/${scrumId}/${newPI}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) throw new Error('Failed to fetch sprints');
+      const data = await response.json();
+      setSprintDetails(data);
+
+      // Set current sprint or first sprint as default
+      const activeSprint = findCurrentSprint(data);
+      if (activeSprint) {
+        setSelectedSprint(activeSprint.sprint_name);
+        setCurrentSprint(activeSprint);
+      } else if (data.length > 0) {
+        setSelectedSprint(data[0].sprint_name);
+        setCurrentSprint(data[0]);
+      }
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Add handler for sprint selection change
+  const handleSprintChange = (sprintName) => {
+    const selectedSprintData = sprintDetails.find(sprint => sprint.sprint_name === sprintName);
+    if (selectedSprintData) {
+      setSelectedSprint(sprintName);
+      setCurrentSprint(selectedSprintData);
+    }
+  };
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
-
-  const currentSprint = sprintDetails.find(sprint => sprint.sprint_name === selectedSprint);
-  if (!currentSprint) return <div>No sprint data available</div>;
 
   const renderSprintOption = (sprint) => {
     const isCurrentSprint = findCurrentSprint([sprint]) !== undefined;
@@ -237,27 +334,44 @@ const SprintDetailsTable = () => {
     <div style={{ width: '90%', margin: 'auto', marginTop: '20px' }}>
       <Card>
         <Card.Header as="h5" style={{ backgroundColor: '#000d6b', color: '#ffffff' }}>
-          {currentSprint.sprint_name} - Sprint Status (PI: {selectedPI})
-          {userRole === 'admin' && (
-            <div style={{ float: 'right' }}>
-              <FaTrash
-                onClick={() => handleDeleteSprintClick(currentSprint.id)}
-                style={{ cursor: 'pointer', color: 'red' }}
-              />
-            </div>
-          )}
+        Program Increment (PI)
         </Card.Header>
         <Card.Body>
-          <Form.Group controlId="sprintSelect">
-            <Form.Label>Select Sprint</Form.Label>
-            <Form.Control
-              as="select"
-              value={selectedSprint}
-              onChange={(e) => setSelectedSprint(e.target.value)}
-            >
-              {sprintDetails.map(renderSprintOption)}
-            </Form.Control>
-          </Form.Group>
+          <Row className="mb-3">
+            <Col md={6}>
+              <Form.Group controlId="piSelect">
+                <Form.Label>Select Increment (PI)</Form.Label>
+                <Form.Select
+                  value={selectedPI}
+                  onChange={(e) => handlePIChange(e.target.value)}
+                  style={{ 
+                    color: '#000d6b',
+                    fontWeight: 'bold',
+                    borderColor: '#000d6b'
+                  }}
+                >
+                  {piList.map((pi, index) => (
+                    <option key={index} value={pi}>{pi}</option>
+                  ))}
+                </Form.Select>
+              </Form.Group>
+            </Col>
+            <Col md={6}>
+              <Form.Group controlId="sprintSelect">
+                <Form.Label>Sprint</Form.Label>
+                <Form.Select
+                  value={selectedSprint}
+                  onChange={(e) => handleSprintChange(e.target.value)}
+                  style={{ 
+                    fontWeight: findCurrentSprint(sprintDetails) ? 'bold' : 'normal',
+                    borderColor: '#000d6b'
+                  }}
+                >
+                  {sprintDetails.map(renderSprintOption)}
+                </Form.Select>
+              </Form.Group>
+            </Col>
+          </Row>
 
           <Row>
             <Col md={4}>
@@ -269,7 +383,7 @@ const SprintDetailsTable = () => {
           </Row>
 
           <Row>
-            <Col md={4}>
+            <Col md={4}> 
               <Card>
                 <Card.Body>
                   <h6>Story Committed</h6>
@@ -313,7 +427,7 @@ const SprintDetailsTable = () => {
               <tr>
                 <th>Story Name</th>
                 <th>Status</th>
-                <th>Completion</th>
+                <th>Completion %</th>
                 <th>Story Points</th>
                 <th>Type</th>
                 {userRole === 'admin' && <th>Actions</th>}

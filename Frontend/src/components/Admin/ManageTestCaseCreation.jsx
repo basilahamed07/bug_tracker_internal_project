@@ -469,7 +469,13 @@ const ManageTestCaseCreationStatus = () => {
         project_name_id: projectNameFromSession, // Set project_name_id based on sessionStorage data
       }));
     }
-
+    const selectedDate = sessionStorage.getItem('date');
+    if (selectedDate) {
+      setFormData(prevState => ({
+      ...prevState,
+      date: selectedDate
+      }));
+    }
 
   }, []);
 
@@ -553,6 +559,9 @@ const ManageTestCaseCreationStatus = () => {
   const handleChange = e => {
     const { name, value } = e.target;
     const newFormData = { ...formData, [name]: value };
+    if(name == 'date'){
+      sessionStorage.setItem('date', value);
+    }
 
     // Automatically update total_test_case_created
     if (name === 'test_case_approved' || name === 'test_case_rejected') {

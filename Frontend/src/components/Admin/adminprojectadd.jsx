@@ -849,6 +849,7 @@ const AdminAddProjectWithDetails = ({ projectNameProp }) => {
   const [errorMessage, setErrorMessage] = useState("");
   const [showErrorPopup, setShowErrorPopup] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedProject, setSelectedProject] = useState('');
 
 
 
@@ -1238,24 +1239,43 @@ const AdminAddProjectWithDetails = ({ projectNameProp }) => {
           },
           body: JSON.stringify(projectDetailsPayload),
         });
+        const responseaftercreateproject = projectDetailsPayload
+        console.log("ReferenceError : " , responseaftercreateproject)
   
         if (!response2.ok) throw new Error('Project details creation failed');
   
         // Clear session data after completing the form
         sessionStorage.removeItem('isProjectCreated');
         sessionStorage.removeItem('formData');
+        sessionStorage.setItem('projectID', projectDataResponse.project_id);
+
+        // const projectNameToStore = selectedProject ? selectedProject : projectName;
+    
+    // Set the project name in sessionStorage
+    formData.projectName = projectName;
+    console.log("DRFTGYHJKLJHGFDSFGHJKGFTDRDTFYGUHGYFTDRSEDTFYGUHJ : " , projectDataResponse);
+    sessionStorage.setItem('projectName', responseaftercreateproject.project_name);
   
       } catch (error) {
         setError('Error creating project details: ' + error.message);
         setShowErrorPopup(true); // Show error message in the popup
-      } finally {
-        setIsPending(false);
-        setShowCreateDetails(false); // Hide the form
-        setShowPopup(false); // Hide the confirmation popup
-  
-        // Navigate to the project info page after successful submission
-        navigate('/AdminPanel/project-info');
-      }
+      } setTimeout(() => {
+        // Retrieve agileType from sessionStorage
+        const agileType = sessionStorage.getItem('agileType');
+      
+        // Check if agileType is defined and proceed with navigation logic
+        if (agileType !== null) {
+          if (agileType === 'true') {
+            navigate('/AdminPanel/ScrumTeamManagement');
+          } else {
+            navigate('/AdminPanel/NonAgileForm');
+          }
+        } else {
+          // Handle the case where agileType is not found in sessionStorage
+          console.error('agileType is not defined in sessionStorage');
+          setErrorMessage('Error: agileType not found in session storage.');
+        }
+      }, 1000); 
     } else {
       // If validation fails, show the error popup
       setShowErrorPopup(true);
@@ -1389,7 +1409,7 @@ const AdminAddProjectWithDetails = ({ projectNameProp }) => {
                         }}>
                           {selectedTesters.billable.length > 0
                             ? selectedTesters.billable.map((t) => t.tester_name).join(', ')
-                            : 'Select Billable Testers'}
+                            : 'Select Testers'}
                         </Dropdown.Toggle>
                         <Dropdown.Menu>
                           {loadingTesters ? (
@@ -1426,7 +1446,7 @@ const AdminAddProjectWithDetails = ({ projectNameProp }) => {
                         <Dropdown.Toggle variant="secondary" id="dropdown-basic" style={{ width: '100%', padding: '10px', textAlign: 'left', backgroundColor: "000d6b" }}>
                           {selectedTesters.nonbillable.length > 0
                             ? selectedTesters.nonbillable.map((t) => t.tester_name).join(', ')
-                            : 'Select Non-Billable Testers'}
+                            : 'Select Testers'}
                         </Dropdown.Toggle>
                         <Dropdown.Menu>
                           {loadingTesters ? (
@@ -1509,19 +1529,26 @@ const AdminAddProjectWithDetails = ({ projectNameProp }) => {
                     </Form.Group>
                     <br />
 
-                    <Form.Group controlId="agile_type">
-              <Form.Label>Project Type</Form.Label>
-              <Form.Control
-                as="select"
-                value={formData.agile_type}
-                onChange={(e) => setFormData({ ...formData, agile_type: e.target.value })}
-                required
-              >
-                <option value="">Select Project Type</option>
-                <option value="Agile">Agile</option>
-                <option value="Non-Agile">Non-Agile</option>
-              </Form.Control>
-            </Form.Group>
+                     <Form.Group controlId="agile_type">
+                    
+                                          <Form.Label>Project Type</Form.Label>
+                                          <Form.Control
+                                            as="select"
+                                            value={formData.agile_type}
+                                            onChange={(e) => {
+                                              const selectedValue = e.target.value;
+                                              setFormData({ ...formData, agile_type: selectedValue });
+                    
+                                              // Set the session storage based on the selected value
+                                              sessionStorage.setItem('agileType', selectedValue === 'Agile' ? 'true' : 'false');
+                                            }}
+                                            required
+                                          >
+                                            <option value="">Select Project Type</option>
+                                            <option value="Agile">Agile</option>
+                                            <option value="Non-Agile">Non-Agile</option>
+                                          </Form.Control>
+                                        </Form.Group>
   
                     
                     <Form.Group controlId="AI">

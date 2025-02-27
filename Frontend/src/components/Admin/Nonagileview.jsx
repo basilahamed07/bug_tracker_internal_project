@@ -1,32 +1,87 @@
-import React from 'react';
-import { Card, Table } from 'react-bootstrap';
+import React, { useState, useEffect } from 'react';
+import { Card, Table, Alert, Spinner } from 'react-bootstrap';
 
 const Nonagileview = () => {
-  // Static data for manual and automation test cases
-  const manualData = {
-    totalTestCases: 120,
-    testCasesExecuted: 110,
-    passed: 100,
-    failed: 10,
-    openDefect: 5
-  };
+  const [manualData, setManualData] = useState(null);
+  const [automationData, setAutomationData] = useState(null);
+  const [openDefects, setOpenDefects] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const automationData = {
-    totalTestCases: 150,
-    testCasesExecuted: 140,
-    passed: 130,
-    failed: 10,
-    openDefect: 3
-  };
+  useEffect(() => {
+    const fetchTestingDetails = async () => {
+      try {
+        const token = sessionStorage.getItem('access_token');
+        const projectId = sessionStorage.getItem('project_name_id');
 
-  // Static data for open defects
-  const openDefects = {
-    totalDefect: 20,
-    critical: 2,
-    high: 5,
-    medium: 8,
-    low: 5
-  };
+        if (!token || !projectId) {
+          throw new Error('Missing required session data');
+        }
+
+        // Fetch manual testing data
+        const manualResponse = await fetch(
+          `https://frt4cnbr-5000.inc1.devtunnels.ms/testing-type/manual/latest/${projectId}`,
+          {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            }
+          }
+        );
+
+        // Fetch automation testing data
+        const automationResponse = await fetch(
+          `https://frt4cnbr-5000.inc1.devtunnels.ms/testing-type/automation/latest/${projectId}`,
+          {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            }
+          }
+        );
+
+        // Fetch open defects data
+        const defectsResponse = await fetch(
+          `https://frt4cnbr-5000.inc1.devtunnels.ms/open_defact/${projectId}`,
+          {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            }
+          }
+        );
+
+        if (!manualResponse.ok || !automationResponse.ok || !defectsResponse.ok) {
+          throw new Error('Failed to fetch data');
+        }
+
+        const manualResult = await manualResponse.json();
+        const automationResult = await automationResponse.json();
+        const defectsResult = await defectsResponse.json();
+
+        setManualData(manualResult);
+        setAutomationData(automationResult);
+        setOpenDefects(defectsResult);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTestingDetails();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="text-center p-5">
+        <Spinner animation="border" role="status" variant="primary">
+          <span className="visually-hidden">Loading...</span>
+        </Spinner>
+      </div>
+    );
+  }
+
+  if (error) {
+    return <Alert variant="danger">Error: {error}</Alert>;
+  }
 
   return (
     <div style={{ width: '80%', margin: 'auto' }}>
@@ -49,13 +104,19 @@ const Nonagileview = () => {
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>{manualData.totalTestCases}</td>
-                  <td>{manualData.testCasesExecuted}</td>
-                  <td>{manualData.passed}</td>
-                  <td>{manualData.failed}</td>
-                  <td>{manualData.openDefect}</td>
-                </tr>
+                {manualData ? (
+                  <tr>
+                    <td>{manualData.total_testcase}</td>
+                    <td>{manualData.tcexecution}</td>
+                    <td>{manualData.passed}</td>
+                    <td>{manualData.fail}</td>
+                    <td>{manualData.opendefact}</td>
+                  </tr>
+                ) : (
+                  <tr>
+                    <td colSpan="5" className="text-center">No manual testing data available</td>
+                  </tr>
+                )}
               </tbody>
             </Table>
           </div>
@@ -74,13 +135,19 @@ const Nonagileview = () => {
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>{automationData.totalTestCases}</td>
-                  <td>{automationData.testCasesExecuted}</td>
-                  <td>{automationData.passed}</td>
-                  <td>{automationData.failed}</td>
-                  <td>{automationData.openDefect}</td>
-                </tr>
+                {automationData ? (
+                  <tr>
+                    <td>{automationData.total_testcase}</td>
+                    <td>{automationData.tcexecution}</td>
+                    <td>{automationData.passed}</td>
+                    <td>{automationData.fail}</td>
+                    <td>{automationData.opendefact}</td>
+                  </tr>
+                ) : (
+                  <tr>
+                    <td colSpan="5" className="text-center">No automation testing data available</td>
+                  </tr>
+                )}
               </tbody>
             </Table>
           </div>
@@ -99,13 +166,19 @@ const Nonagileview = () => {
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>{openDefects.totalDefect}</td>
-                  <td>{openDefects.critical}</td>
-                  <td>{openDefects.high}</td>
-                  <td>{openDefects.medium}</td>
-                  <td>{openDefects.low}</td>
-                </tr>
+                {openDefects ? (
+                  <tr>
+                    <td>{openDefects.total_defect}</td>
+                    <td>{openDefects.critical}</td>
+                    <td>{openDefects.high}</td>
+                    <td>{openDefects.medium}</td>
+                    <td>{openDefects.low}</td>
+                  </tr>
+                ) : (
+                  <tr>
+                    <td colSpan="5" className="text-center">No defect data available</td>
+                  </tr>
+                )}
               </tbody>
             </Table>
           </div>

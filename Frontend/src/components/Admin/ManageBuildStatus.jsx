@@ -509,7 +509,13 @@ const ManageBuildStatus = () => {
       }));
     }
 
-
+    const selectedDate = sessionStorage.getItem('date');
+    if (selectedDate) {
+      setFormData(prevState => ({
+        ...prevState,
+        date: selectedDate, // Set the date from sessionStorage
+      }));
+    }
 
   }, []);
 
@@ -572,6 +578,9 @@ const ManageBuildStatus = () => {
 
   const handleChange = e => {
     const { name, value } = e.target;
+    if(name === 'date'){
+      sessionStorage.setItem('date', value); // Store the selected date in sessionStorage
+    }
 
     if (name === 'builds_accepted' || name === 'builds_rejected') {
       // Automatically calculate total_build_received
