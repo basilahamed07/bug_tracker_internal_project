@@ -72,7 +72,7 @@ const MetricsForm = () => {
     fetchPendingProjects();
 
     // Retrieve the selected project name from sessionStorage
-    const projectNameFromSession = sessionStorage.getItem('projectName');
+    const projectNameFromSession = sessionStorage.getItem('selectedProject');
     if (projectNameFromSession) {
       setProjectName(projectNameFromSession); // Set the project name from session
       setFormData(prevState => ({

@@ -17,11 +17,11 @@ const SKILL_OPTIONS = [
   'DevOps',
   'Scrum Master',
   'Product Owner',
-  'UI/UX',
+  'UI/UX', 
   'Database',
   'Mobile Development'
 ];
-
+ 
 export default function ScrumTeamManagement() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTeam, setSelectedTeam] = useState(null);
@@ -43,9 +43,18 @@ export default function ScrumTeamManagement() {
   });
   const [testers, setTesters] = useState([]);
 
+
   const navigate = useNavigate(); // Initialize useNavigate hook
 
   const [projectNameId, setProjectNameId] = useState([]);
+
+  const [errors, setErrors] = useState({
+    teamName: '',
+    testerNameId: '',
+    joinDate: '',
+    priorExp: '',
+    skillSet: ''
+  });
 
   const calculateCptExp = (joinDate) => {
     if (!joinDate) return '0.0';
@@ -93,30 +102,22 @@ useEffect(() => {
 
         const projects = response.data.projects;
         if (Array.isArray(projects)) {
-          const projectNameFromSession = sessionStorage.getItem('projectName');
-          const matchedProject = projects.find(project => project.project_name === projectNameFromSession);
+          // Get project ID from sessionStorage
+          const projectId = sessionStorage.getItem('projectID');
+          if (projectId) {
+            const matchedProject = projects.find(project => project.id === parseInt(projectId));
 
-          if (matchedProject) {
-            sessionStorage.setItem('projectNameId', matchedProject.id);
-
-            // Update formData with the matched projectNameId
-            setProjectNameId(prevData => ({
-              ...prevData,
-              projectNameId: matchedProject.id
-            }));
-
-            console.log('Matched Project ID:', matchedProject.id);
-
-            console.log('Matched Project ID:', projectNameId);
-
-
-            // Fetch testers for the matched project
-            fetchTesters(matchedProject.id);
-          } else {
-            console.log('No matching project found.');
+            if (matchedProject) {
+              sessionStorage.setItem('project_name_id', matchedProject.id);
+              setProjectNameId(prevData => ({
+                ...prevData,
+                projectNameId: matchedProject.id
+              }));
+              
+              // Call fetchTesters with the project ID
+              fetchTesters(projectId);
+            }
           }
-        } else {
-          console.error('Projects not found or invalid format in response.');
         }
       } catch (error) {
         console.error('Error fetching projects:', error);
@@ -125,29 +126,31 @@ useEffect(() => {
 
     const fetchTesters = async (projectId) => {
       try {
-        const token = sessionStorage.getItem('access_token'); // Retrieve the token from sessionStorage
-        if (!token) {
-          console.error('Authorization token is missing!');
+        const token = sessionStorage.getItem('access_token');
+        if (!token || !projectId) {
+          console.error('Missing token or project ID');
           return;
         }
     
-        // Include the token in the Authorization header
         const response = await axios.get(`https://frt4cnbr-5000.inc1.devtunnels.ms/tester_name_by_project/${projectId}`, {
           headers: {
-            'Authorization': `Bearer ${token}` // Add the token to the header
+            'Authorization': `Bearer ${token}`
           }
         });
     
-        const testerData = response.data;
-        setTesters(testerData); // Set the testers in the state
-      } catch (error) {
+        if (response.data && Array.isArray(response.data)) {
+          setTesters(response.data);
+          console.log('Fetched testers:', response.data);
+        } else {
+          console.error('Invalid tester data format:', response.data);
+        }
+      } catch (error) { 
         console.error('Error fetching testers:', error);
       }
     };
-    
 
     fetchProjects();
-  }, []); // Only run once when the component mounts
+  }, []); // Only run once when component mounts
 
   useEffect(() => {
     if (formData.name.trim()) {
@@ -172,8 +175,143 @@ useEffect(() => {
     sessionStorage.setItem('teamMembers', JSON.stringify(teamMembers));
   }, [teamMembers]);
 
+  const validateForm = () => {
+    let isValid = true;
+    const newErrors = {
+      teamName: '',
+      testerNameId: '',
+      joinDate: '',
+      priorExp: '',
+      skillSet: ''
+    };
+
+    // Team name validation - enhanced
+    if (!formData.teamName || !formData.teamName.trim()) {
+      newErrors.teamName = 'Team name is required';
+      isValid = false;
+    } else if (formData.teamName.trim().length < 3) {
+      newErrors.teamName = 'Team name must be at least 3 characters';
+      isValid = false;
+    }
+
+    // Resource selection validation
+    if (!formData.testerNameId) {
+      newErrors.testerNameId = 'Please select a resource';
+      isValid = false;
+    }
+
+    // Join date validation - enhanced
+    if (!formData.joinDate) {
+      newErrors.joinDate = 'Join date is required';
+      isValid = false;
+    } else {
+      const joinDate = new Date(formData.joinDate);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Reset time part for accurate date comparison
+      
+      if (isNaN(joinDate.getTime())) {
+        newErrors.joinDate = 'Please enter a valid date';
+        isValid = false;
+      } else if (joinDate > today) {
+        newErrors.joinDate = 'Join date cannot be in the future';
+        isValid = false;
+      }
+    }
+
+    // Prior experience validation - enhanced
+    if (!formData.priorExp) {
+      newErrors.priorExp = 'Prior experience is required';
+      isValid = false;
+    } else {
+      const priorExpStr = formData.priorExp.toString();
+      const priorExpFloat = parseFloat(priorExpStr);
+      const [years, months] = priorExpStr.split('.');
+      
+      if (isNaN(priorExpFloat) || priorExpFloat < 0) {
+        newErrors.priorExp = 'Please enter a valid experience (e.g., 2.6)';
+        isValid = false;
+      } else if (months && (parseInt(months) >= 12 || months.length > 2)) {
+        newErrors.priorExp = 'Months should be between 0 and 11';
+        isValid = false;
+      }
+    }
+
+    // Skills validation - enhanced
+    if (!formData.skillSet || formData.skillSet.length === 0) {
+      newErrors.skillSet = 'Please select at least one skill';
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
+  const validateField = (name, value) => {
+    switch (name) {
+      case 'teamName':
+        if (!value || !value.trim()) {
+          return 'Team name is required';
+        } else if (value.trim().length < 3) {
+          return 'Team name must be at least 3 characters';
+        }
+        break;
+  
+      case 'testerNameId':
+        if (!value) {
+          return 'Please select a resource';
+        }
+        break;
+  
+      case 'joinDate':
+        if (!value) {
+          return 'Join date is required';
+        } else {
+          const joinDate = new Date(value);
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          
+          if (isNaN(joinDate.getTime())) {
+            return 'Please enter a valid date';
+          } else if (joinDate > today) {
+            return 'Join date cannot be in the future';
+          }
+        }
+        break;
+  
+      case 'priorExp':
+        if (!value) {
+          return 'Prior experience is required';
+        } else {
+          const priorExpStr = value.toString();
+          const priorExpFloat = parseFloat(priorExpStr);
+          const [years, months] = priorExpStr.split('.');
+          
+          if (isNaN(priorExpFloat) || priorExpFloat < 0) {
+            return 'Please enter a valid experience (e.g., 2.6)';
+          } else if (months && (parseInt(months) >= 12 || months.length > 2)) {
+            return 'Months should be between 0 and 11';
+          }
+        }
+        break;
+  
+      case 'skillSet':
+        if (!value || value.length === 0) {
+          return 'Please select at least one skill';
+        }
+        break;
+  
+      default:
+        return '';
+    }
+    return '';
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
 
     let teamNumber;
     let teamName = formData.teamName.trim();
@@ -384,7 +522,7 @@ useEffect(() => {
     return groups;
   }, {});
 
-  
+  const hasTeams = Object.keys(teamGroups).length > 0;
 
   return (
     <div className="p-8">
@@ -532,15 +670,17 @@ useEffect(() => {
                 <Button
           variant="primary"
           onClick={submitToAPI}
+          disabled={!hasTeams}
           style={{
             fontWeight: 'bold',
             color: '#ffffff',
             backgroundColor: '#000d6b',
             borderColor: '#000d6b',
             marginBottom: '20px',
+            opacity: hasTeams ? 1 : 0.5, // Visual feedback for disabled state
           }}
         >
-          Submit All Changes
+          {hasTeams ? 'Submit All Changes' : 'Sbumit All Changes'}
         </Button>
 
         {/* Modal */}
@@ -554,12 +694,21 @@ useEffect(() => {
                 <label className="form-label">Team Name</label>
                 <input
                   type="text"
-                  className="form-control"
-                  required
+                  className={`form-control ${errors.teamName ? 'is-invalid' : ''}`}
                   value={formData.teamName}
-                  onChange={(e) => setFormData({ ...formData, teamName: e.target.value })}
+                  placeholder="Enter team name (min. 3 characters)"
+                  onChange={(e) => {
+                    setFormData({ ...formData, teamName: e.target.value });
+                    if (errors.teamName) setErrors({ ...errors, teamName: '' });
+                  }}
+                  onBlur={(e) => {
+                    const error = validateField('teamName', e.target.value);
+                    setErrors(prev => ({ ...prev, teamName: error }));
+                  }}
                 />
+                {errors.teamName && <div className="invalid-feedback">{errors.teamName}</div>}
               </div>
+
               <div className="mb-3">
                 <label className="form-label">Select Resource </label>
                 
@@ -567,15 +716,22 @@ useEffect(() => {
                   value={formData.testerNameId}
                   onChange={(e) => {
                     const selectedTesterId = e.target.value;
-                    const selectedTester = testers.find(tester => tester.id === Number(selectedTesterId));
+                    const selectedTester = testers.find(tester => tester.id === parseInt(selectedTesterId));
 
                     setFormData({
                       ...formData,
                       testerNameId: selectedTesterId,
                       name: selectedTester ? selectedTester.tester_name : '', // Set name based on selected tester
                     });
+                    if (errors.testerNameId) {
+                      setErrors({ ...errors, testerNameId: '' });
+                    }
                   }}
-                  className="form-control"
+                  className={`form-control ${errors.testerNameId ? 'is-invalid' : ''}`}
+                  onBlur={(e) => {
+                    const error = validateField('testerNameId', e.target.value);
+                    setErrors(prev => ({ ...prev, testerNameId: error }));
+                  }}
                 >
                   <option value="">Select Tester</option>
                   {testers.map(tester => (
@@ -584,36 +740,47 @@ useEffect(() => {
                     </option>
                   ))}
                 </select>
-
-
-
+                {errors.testerNameId && <div className="invalid-feedback">{errors.testerNameId}</div>}
               </div>
               <div className="mb-3">
                 <label className="form-label">CPT JOD</label>
                 <input
                   type="date"
-                  className="form-control"
-                  required
+                  className={`form-control ${errors.joinDate ? 'is-invalid' : ''}`}
                   value={formData.joinDate}
-                  onChange={(e) => setFormData({ ...formData, joinDate: e.target.value })}
+                  placeholder="Select join date"
+                  onChange={(e) => {
+                    setFormData({ ...formData, joinDate: e.target.value });
+                    if (errors.joinDate) setErrors({ ...errors, joinDate: '' });
+                  }}
+                  onBlur={(e) => {
+                    const error = validateField('joinDate', e.target.value);
+                    setErrors(prev => ({ ...prev, joinDate: error }));
+                  }}
                 />
+                {errors.joinDate && <div className="invalid-feedback">{errors.joinDate}</div>}
               </div>
               <div className="mb-3">
                 <label className="form-label">Prior Experience (years.months)</label>
                 <input
-                  type="number"
-                  className="form-control"
-                  required
-                  pattern="\d+\.\d+" // This allows a number with a decimal point, e.g., 4.5
+                  type="text"
+                  className={`form-control ${errors.priorExp ? 'is-invalid' : ''}`}
                   placeholder="e.g., 2.6"
                   value={formData.priorExp}
-                  onChange={(e) => setFormData({ ...formData, priorExp: e.target.value })}
-                  step="0.1" // Allows decimal input
+                  onChange={(e) => {
+                    setFormData({ ...formData, priorExp: e.target.value });
+                    if (errors.priorExp) setErrors({ ...errors, priorExp: '' });
+                  }}
+                  onBlur={(e) => {
+                    const error = validateField('priorExp', e.target.value);
+                    setErrors(prev => ({ ...prev, priorExp: error }));
+                  }}
                 />
+                {errors.priorExp && <div className="invalid-feedback">{errors.priorExp}</div>}
               </div>
               <div className="mb-3">
                 <label className="form-label">Skill Set</label>
-                <div className="d-flex flex-wrap gap-2">
+                <div className={`d-flex flex-wrap gap-2 ${errors.skillSet ? 'is-invalid' : ''}`}>
                   {SKILL_OPTIONS.map((skill) => (
                     <Button
                       key={skill}
@@ -625,12 +792,16 @@ useEffect(() => {
                             ? prev.skillSet.filter(s => s !== skill)
                             : [...prev.skillSet, skill]
                         }));
+                        if (errors.skillSet) {
+                          setErrors({ ...errors, skillSet: '' });
+                        }
                       }}
                     >
                       {skill}
                     </Button>
                   ))}
                 </div>
+                {errors.skillSet && <div className="text-danger mt-2">{errors.skillSet}</div>}
               </div>
               <Button
                 variant="primary"

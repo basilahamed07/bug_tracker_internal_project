@@ -5,7 +5,7 @@ import { Button, Table, Form, Card, Row, Col, Modal } from 'react-bootstrap';
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 
-
+ 
 
 import { useNavigate } from 'react-router-dom'; // Use useNavigate instead of useHistory
 
@@ -58,7 +58,7 @@ const ManageTotalDefectStatus = () => {
 
 
     // Retrieve the selected project name from sessionStorage
-    const projectNameFromSession = sessionStorage.getItem('projectName');
+    const projectNameFromSession = sessionStorage.getItem('selectedProject');
     if (projectNameFromSession) {
       setProjectName(projectNameFromSession); // Set the project name from session
       setFormData(prevState => ({
@@ -128,7 +128,7 @@ const ManageTotalDefectStatus = () => {
   const validateForm = () => {
     const requiredFields = [
       'date',
-      'total_defect',
+      // 'total_defect',
       'open_defect',
       'defect_closed',
       'critical',
@@ -321,10 +321,10 @@ const ManageTotalDefectStatus = () => {
     // const isValid = Object.values(formData).every(field => field !== '');
     const isValid = validateForm()
     if (!isValid) {
-      alert('Please fill all the fields before proceeding.');
+      // alert('Please fill all the fields before proceeding.');
       return;
     }
-
+ 
     // Store the form data in localStorage
     localStorage.setItem('ManageTotalDefectStatuses', JSON.stringify(formData));
 
@@ -410,6 +410,7 @@ const ManageTotalDefectStatus = () => {
                       max={new Date().toISOString().split('T')[0]}
                       isInvalid={!!errors.date}
                       disabled={editingStatus} // Disable date input when editing
+                      placeholder="Select date"
                     />
                     <Form.Control.Feedback type="invalid">{errors.date}</Form.Control.Feedback>
                   </Form.Group>
@@ -425,6 +426,7 @@ const ManageTotalDefectStatus = () => {
                       isInvalid={!!errors.total_defect}
                       readOnly
                       style={{ backgroundColor: '#e9ecef' }}
+                      placeholder="Auto-calculated from severity counts"
                     />
                     <Form.Control.Feedback type="invalid">{errors.total_defect}</Form.Control.Feedback>
                   </Form.Group>
@@ -438,6 +440,8 @@ const ManageTotalDefectStatus = () => {
                       onChange={handleChange}
                       onBlur={handleBlur}
                       isInvalid={!!errors.defect_closed}
+                      placeholder="Enter number of closed defects"
+                      min="0"
                     />
                     <Form.Control.Feedback type="invalid">{errors.defect_closed}</Form.Control.Feedback>
                   </Form.Group>
@@ -452,7 +456,8 @@ const ManageTotalDefectStatus = () => {
                       onBlur={handleBlur}
                       isInvalid={!!errors.open_defect}
                       // readOnly
-                      style={{ backgroundColor: '#e9ecef' }}
+                      // style={{ backgroundColor: '#e9ecef' }}
+                      placeholder="Auto-calculated from total and closed defects"
                     />
                     <Form.Control.Feedback type="invalid">{errors.open_defect}</Form.Control.Feedback>
                   </Form.Group>
@@ -468,6 +473,7 @@ const ManageTotalDefectStatus = () => {
                       type="text"
                       value={sessionStorage.getItem('selectedProject') || projectName} // Retrieve from sessionStorage if available
                       readOnly // Make the input read-only
+                      placeholder="Project name will be displayed here"
                     />
                   </Form.Group>
 
@@ -483,6 +489,8 @@ const ManageTotalDefectStatus = () => {
                       onChange={handleChange}
                       onBlur={handleBlur}
                       isInvalid={!!errors.critical}
+                      placeholder="Enter number of critical defects"
+                      min="0"
                     />
                     <Form.Control.Feedback type="invalid">{errors.critical}</Form.Control.Feedback>
                   </Form.Group>
@@ -496,6 +504,8 @@ const ManageTotalDefectStatus = () => {
                       onChange={handleChange}
                       onBlur={handleBlur}
                       isInvalid={!!errors.high}
+                      placeholder="Enter number of high priority defects"
+                      min="0"
                     />
                     <Form.Control.Feedback type="invalid">{errors.high}</Form.Control.Feedback>
                   </Form.Group>
@@ -509,6 +519,8 @@ const ManageTotalDefectStatus = () => {
                       onChange={handleChange}
                       onBlur={handleBlur}
                       isInvalid={!!errors.medium}
+                      placeholder="Enter number of medium priority defects"
+                      min="0"
                     />
                     <Form.Control.Feedback type="invalid">{errors.medium}</Form.Control.Feedback>
                   </Form.Group>
@@ -522,6 +534,8 @@ const ManageTotalDefectStatus = () => {
                       onChange={handleChange}
                       onBlur={handleBlur}
                       isInvalid={!!errors.low}
+                      placeholder="Enter number of low priority defects"
+                      min="0"
                     />
                     <Form.Control.Feedback type="invalid">{errors.low}</Form.Control.Feedback>
                   </Form.Group>

@@ -1,7 +1,7 @@
 # updated code 
 from flask import jsonify, request
 from werkzeug.security import generate_password_hash, check_password_hash
-from models import db,Users,Project_name,Project_details,New_defects,Total_Defect_Status,Test_execution_status,Testers,TestCaseCreationStatus,DefectAcceptedRejected,BuildStatus
+from models import db,Users,Project_name,Project_details,New_defects,Total_Defect_Status,Test_execution_status,Testers,TestCaseCreationStatus,DefectAcceptedRejected,BuildStatus,Tester_name
 from flask_jwt_extended import create_access_token,jwt_required,get_jwt_identity
 import os
 from datetime import date
@@ -423,8 +423,10 @@ def test_details_route(app):
                 if field not in data:
                     return jsonify({"error": f"Missing required field: {field}"}), 400
                 
+            print(data['project_name_id'])
             date_in_month = get_month(data['date'])
             project_id = get_project_name(data['project_name_id']).id
+            print("project_id : ",project_id)
 
             # Create new total defect status from the provided data
             new_defect_status = Total_Defect_Status(
@@ -947,42 +949,207 @@ def test_details_route(app):
             return jsonify(final_data)
 
 
-
-
-
-            # for trash in collection_dataframe_month:
-            #     print(type(trash))
-            #     latest = trash.sort_values(by = ['date', 'Month'], ascending = [False, False])
-            #     final_data.append(latest.head(3))
-
-            # for trash in final_data:
-            #     print(trash)
-
-            #here i have the month of the table have
-            month = get_mon_full_details(list_of_databsae,id)
-            print(month)
-            collection_data = {}
-            for trash in list_of_databsae:
-                for trash1 in month:
-                    # print(trash)
-                    temp_variable = trash.query.filter_by(project_name_id=id, month=trash1).order_by(trash.date.desc()).first()
-                    if temp_variable is None:
-                        continue
-                    else:
-                        # Get the key for the current table (using `get_var_name`)
-                        key = get_var_name(trash)
-                        # print(key)
-
-                        # Check if the key exists in the dictionary
-                        if key not in collection_data:
-                            collection_data[key] = []
-
-                        # Append a new dictionary with the index to the list under the key
-                        collection_data[key].append(temp_variable.to_dict())
-
-                        continue  # Continue with the next iteration of the inner loop
+    # @app.route('/tester_full_details', methods=['GET'])
+    # @jwt_required()
+    # def tester_details():
+    #     try:
+    #         # Get all testers from the database
+    #         testers = Testers.query.all()
+    #         if not testers:
+    #             return jsonify({"message": "No testers found"}), 404
+            
+    #         tester_details = {}
+    #         print("tester_details :",tester_details)
+            
+    #         # Iterate through each tester to gather project data
+    #         for tester in testers:
+    #             # Get tester name from the Tester_name table using tester_name_id
+    #             tester_name_record = Tester_name.query.get(tester.tester_name_id)
                 
-                
-            # print(collection_data)
+    #             if tester_name_record:
+    #                 tester_name = tester_name_record.tester_name  # Fetch the tester name
+                    
+    #                 # Get project details for each tester
+    #                 project = Project_name.query.get(tester.project_name_id)
+                    
+    #                 # Get the project details to check the billable or nonbillable status
+    #                 project_details = Project_details.query.filter_by(project_name_id=project.id).first() if project else None
+                    
+    #                 # If project details are found, print them for debugging
+    #                 if project_details:
+    #                     print(f"Project details for tester '{tester_name}' (ID: {tester.id}):")
+    #                     print(f"Project ID: {project.id}")
+    #                     print(f"Project Name: {project.project_name}")
+    #                     print(f"Billable Testers: {project_details.billable}")
+    #                     print(f"Non-Billable Testers: {project_details.nonbillable}")
+                    
+    #                 # If tester name not in dict, create new entry
+    #                 if tester_name not in tester_details:
+    #                     tester_details[tester_name] = {
+    #                         "Tester_id": tester.id,  # Include tester_id in the response
+    #                         "tester_name": tester_name,  # Include tester_name in the response
+    #                         "projects": [],
+    #                         "billable": None  # Default to None, we will set it based on project check
+    #                     }
+    #                 print("tester_details: ", tester_details)
 
-            return jsonify({"test_project_details":collection_data,"project_name":project_name})
+    #                 # Initialize billable status as False
+    #                 is_billable = False
+                    
+    #                 # Check if the tester's ID is in the Billable Testers list for the project
+    #                 if project_details:
+    #                     if tester.id in project_details.billable:
+    #                         is_billable = True
+    #                     else:
+    #                         is_billable = False
+                        
+    #                     # Set the tester's billable status for the project
+    #                     if is_billable:
+    #                         tester_details[tester_name]["billable"] = True
+    #                     else:
+    #                         if tester_details[tester_name]["billable"] is None:
+    #                             tester_details[tester_name]["billable"] = False
+                    
+    #                 # Add project details to the tester's data
+    #                 if project:
+    #                     tester_details[tester_name]["projects"].append({
+    #                         "tester_id": tester.id,  # Include tester_id in the project details
+    #                         "project_id": project.id,
+    #                         "project_name": project.project_name,
+    #                         "Billable/Non billable": "True" if is_billable else "False"  # Correct Billable/Non billable status
+    #                     })
+                        
+    #             # If no projects or tester details are found, move to the next one
+    #         return jsonify({
+    #             "tester_details": tester_details
+    #         }), 200
+            
+    #     except Exception as e:
+    #         return jsonify({"error": str(e)}), 500
+
+    # @app.route('/tester_full_details', methods=['GET'])
+    # @jwt_required()
+    # def tester_details():
+    #     try:
+    #         # Get all testers from the database
+    #         testers = Testers.query.all()
+    #         if not testers:
+    #             return jsonify({"message": "No testers found"}), 404
+            
+    #         tester_details = {}
+    #         print("tester_details :", tester_details)
+            
+    #         # Iterate through each tester to gather project data
+    #         for tester in testers:
+    #             # Get tester name from the Tester_name table using tester_name_id
+    #             tester_name_record = Tester_name.query.get(tester.tester_name_id)
+                
+    #             if tester_name_record:
+    #                 tester_name = tester_name_record.tester_name  # Fetch the tester name
+                    
+    #                 # Get project details for each tester
+    #                 project = Project_name.query.get(tester.project_name_id)
+                    
+    #                 # Get the project details to check the billable or nonbillable status
+    #                 project_details = Project_details.query.filter_by(project_name_id=project.id).first() if project else None
+                    
+    #                 # If project details are found, print them for debugging
+    #                 if project_details:
+    #                     print(f"Project details for tester '{tester_name}' (ID: {tester.id}):")
+    #                     print(f"Project ID: {project.id}")
+    #                     print(f"Project Name: {project.project_name}")
+    #                     print(f"Billable Testers: {project_details.billable}")
+    #                     print(f"Non-Billable Testers: {project_details.nonbillable}")
+                    
+    #                 # If tester name not in dict, create new entry
+    #                 if tester_name not in tester_details:
+    #                     tester_details[tester_name] = {
+    #                         "Tester_id": tester.id,  # Include tester_id in the response
+    #                         "tester_name": tester_name,  # Include tester_name in the response
+    #                         "projects": []
+    #                     }
+    #                 print("tester_details: ", tester_details)
+
+    #                 # Initialize billable status as False
+    #                 is_billable = False
+                    
+    #                 # Check if the tester's ID is in the Billable Testers list for the project
+    #                 if project_details:
+    #                     if tester.id in project_details.billable:
+    #                         is_billable = True
+    #                     elif tester.id in project_details.nonbillable:
+    #                         is_billable = False
+                    
+    #                 # Add project details to the tester's data, ensuring the tester_id is the correct one
+    #                 if project:
+    #                     tester_details[tester_name]["projects"].append({
+    #                         "tester_id": tester.id,  # Always use the tester's ID here
+    #                         "project_id": project.id,
+    #                         "project_name": project.project_name,
+    #                         "Billable/Non billable": "True" if is_billable else "False"  # Correct Billable/Non billable status
+    #                     })
+                
+    #             # If no projects or tester details are found, move to the next one
+    #         return jsonify({
+    #             "tester_details": tester_details
+    #         }), 200
+            
+    #     except Exception as e:
+    #         return jsonify({"error": str(e)}), 500
+
+        
+    @app.route('/tester_full_details', methods=['GET'])
+    @jwt_required()
+    def tester_details():
+        try:
+            # Get all testers from the database
+            testers = Testers.query.all()
+            if not testers:
+                return jsonify({"message": "No testers found"}), 404
+            
+            tester_details = {}
+            # print("tester_details :", tester_details)
+            
+            # Iterate through each tester to gather project data
+            for tester in testers:
+                # Get tester name from the Tester_name table using tester_name_id
+                tester_name_record = Tester_name.query.get(tester.tester_name_id)
+                
+                if tester_name_record:
+                    tester_name = tester_name_record.tester_name  # Fetch the tester name
+                    
+                    # Get project details for each tester
+                    project = Project_name.query.get(tester.project_name_id)
+                    
+                    # If project is found, print the project details for debugging
+                    # if project:
+                    #     print(f"Project details for tester '{tester_name}' (ID: {tester.id}):")
+                    #     print(f"Project ID: {project.id}")
+                    #     print(f"Project Name: {project.project_name}")
+                    #     print(f"Billable: {'True' if tester.billable else 'False'}")
+                    
+                    # If tester name not in dict, create a new entry
+                    if tester_name not in tester_details:
+                        tester_details[tester_name] = {
+                            "Tester_id": tester.id,  # Include tester_id in the response
+                            "tester_name": tester_name,  # Include tester_name in the response
+                            "projects": []
+                        }
+                    # print("tester_details: ", tester_details)
+                    
+                    # Add project details to the tester's data, ensuring the tester_id is correct
+                    if project:
+                        tester_details[tester_name]["projects"].append({
+                            "tester_id": tester.id,  # Always use the tester's ID here
+                            "project_id": project.id,
+                            "project_name": project.project_name,
+                            "Billable/Non billable": "True" if tester.billable else "False"  # Use the tester's billable attribute
+                        })
+            
+            # Return the gathered tester details as JSON
+            return jsonify({
+                "tester_details": tester_details
+            }), 200
+            
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
