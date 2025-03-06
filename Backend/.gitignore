@@ -25,3 +25,5 @@ yarn-error.log*
 /internal_project
 
 .env
+/env_internal_task
+.env.local

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { FaEdit, FaTrashAlt } from 'react-icons/fa';
 import { Button, Table, Form, Card, Row, Col, Modal } from 'react-bootstrap';
-import axios from 'axios';
+import axios from 'axios'; 
 import { useNavigate } from 'react-router-dom'; // Use useNavigate instead of useHistory
 
 
@@ -58,7 +58,7 @@ const ManageDefects = () => {
     }
     const storedDate = sessionStorage.getItem('date');
     // Retrieve the selected project name from sessionStorage
-    const projectNameFromSession = sessionStorage.getItem('projectName');
+    const projectNameFromSession = sessionStorage.getItem('selectedProject');
     if (projectNameFromSession) {
       setProjectName(projectNameFromSession); // Set the project name from session
       setFormData(prevState => ({
@@ -270,7 +270,7 @@ const ManageDefects = () => {
     // const isValid = Object.values(formData).every(field => field !== '');
     const isValid = validateForm()
     if (!isValid) {
-      alert('Please fill all the fields before proceeding.');
+      // alert('Please fill all the fields before proceeding.');
       return;
     }
 
@@ -281,7 +281,6 @@ const ManageDefects = () => {
     navigate('/AdminPanel/ManageTestExecutionStatus');
     // window.location.reload();
   };
-
 
 
 
@@ -351,6 +350,7 @@ const ManageDefects = () => {
                     isInvalid={!!errors.date}
                     disabled={editingDefect}
                     max={new Date().toISOString().split('T')[0]} // Max date today
+                    placeholder="Select date"
                   />
                   <Form.Control.Feedback type="invalid">{errors.date}</Form.Control.Feedback>
                 </Form.Group>
@@ -365,6 +365,8 @@ const ManageDefects = () => {
                     onChange={handleChange}
                     onBlur={handleBlur}
                     isInvalid={!!errors.regression_defect}
+                    placeholder="Enter number of regression defects"
+                    min="0"
                   />
                   <Form.Control.Feedback type="invalid">{errors.regression_defect}</Form.Control.Feedback>
                 </Form.Group>
@@ -379,6 +381,8 @@ const ManageDefects = () => {
                     onChange={handleChange}
                     onBlur={handleBlur}
                     isInvalid={!!errors.defect_reopened}
+                    placeholder="Enter number of reopened defects"
+                    min="0"
                   />
                   <Form.Control.Feedback type="invalid">{errors.defect_reopened}</Form.Control.Feedback>
                 </Form.Group>
@@ -395,6 +399,8 @@ const ManageDefects = () => {
                     onChange={handleChange}
                     onBlur={handleBlur}
                     isInvalid={!!errors.functional_defect}
+                    placeholder="Enter number of functional defects"
+                    min="0"
                   />
                   <Form.Control.Feedback type="invalid">{errors.functional_defect}</Form.Control.Feedback>
                 </Form.Group>
@@ -409,6 +415,8 @@ const ManageDefects = () => {
                     onChange={handleChange}
                     onBlur={handleBlur}
                     isInvalid={!!errors.uat_defect}
+                    placeholder="Enter number of UAT defects"
+                    min="0"
                   />
                   <Form.Control.Feedback type="invalid">{errors.uat_defect}</Form.Control.Feedback>
                 </Form.Group>
@@ -423,12 +431,9 @@ const ManageDefects = () => {
                     onChange={handleChange}
                     onBlur={handleBlur}
                     readOnly // Make the input read-only
+                    placeholder="Project name will be displayed here"
                   />
                 </Form.Group>
-
-
-
-
               </Col>
             </Row>
 
