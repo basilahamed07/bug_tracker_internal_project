@@ -25,7 +25,7 @@
 //     const token = sessionStorage.getItem('access_token'); // Get the access token from session storage
 //     setLoading(true);
 //     try {
-//       const url = `https://frt4cnbr-5000.inc1.devtunnels.ms/full_test_details/${projectNameId}`;
+//       const url = `http://localhost:5000/full_test_details/${projectNameId}`;
 //       console.log('Requesting data from URL:', url);
 
 //       const response = await axios.get(url, {
@@ -233,7 +233,7 @@ const ProjectDetails = () => {
     const token = sessionStorage.getItem('access_token'); // Get the access token from session storage
     setLoading(true);
     try {
-      const url = `https://frt4cnbr-5000.inc1.devtunnels.ms/full_test_details/${projectNameId}`;
+      const url = `http://localhost:5000/full_test_details/${projectNameId}`;
       console.log('Requesting data from URL:', url);
 
       const response = await axios.get(url, {

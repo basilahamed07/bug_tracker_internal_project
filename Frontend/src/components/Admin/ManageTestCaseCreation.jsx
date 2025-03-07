@@ -73,7 +73,7 @@ const ManageTestCaseCreationStatus = () => {
   const fetchTestCaseStatuses = async () => {
     const token = sessionStorage.getItem('access_token');
     try {
-      const response = await axios.get('https://frt4cnbr-5000.inc1.devtunnels.ms/test_case_creation_status', {
+      const response = await axios.get('http://localhost:5000/test_case_creation_status', {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -88,7 +88,7 @@ const ManageTestCaseCreationStatus = () => {
   const fetchUserProjects = async () => {
     const token = sessionStorage.getItem('access_token');
     try {
-      const response = await axios.get('https://frt4cnbr-5000.inc1.devtunnels.ms/get-user-projects', {
+      const response = await axios.get('http://localhost:5000/get-user-projects', {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -105,7 +105,7 @@ const ManageTestCaseCreationStatus = () => {
   const handleViewDefect = async (projectId) => {
     const token = sessionStorage.getItem('access_token');
     try {
-      const response = await axios.get(`https://frt4cnbr-5000.inc1.devtunnels.ms/test_case_creation_status/${projectId}`, {
+      const response = await axios.get(`http://localhost:5000/test_case_creation_status/${projectId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -183,8 +183,8 @@ const ManageTestCaseCreationStatus = () => {
     const token = sessionStorage.getItem('access_token');
     const method = editingStatus ? 'PUT' : 'POST';
     const url = editingStatus
-      ? `https://frt4cnbr-5000.inc1.devtunnels.ms/test_case_creation_status/${editingStatus.id}`
-      : 'https://frt4cnbr-5000.inc1.devtunnels.ms/test_case_creation_status';
+      ? `http://localhost:5000/test_case_creation_status/${editingStatus.id}`
+      : 'http://localhost:5000/test_case_creation_status';
 
     try {
       const response = await axios({
@@ -232,27 +232,27 @@ const ManageTestCaseCreationStatus = () => {
       const endpoints = [
         {
           key: 'ManageBuildStatus',
-          url: 'https://frt4cnbr-5000.inc1.devtunnels.ms/build_status'
+          url: 'http://localhost:5000/build_status'
         },
         {
           key: 'ManageDefectAcceptedRejected',
-          url: 'https://frt4cnbr-5000.inc1.devtunnels.ms/defect_accepted_rejected'
+          url: 'http://localhost:5000/defect_accepted_rejected'
         },
         {
           key: 'ManageTestCaseCreation',
-          url: 'https://frt4cnbr-5000.inc1.devtunnels.ms/test_case_creation_status'
+          url: 'http://localhost:5000/test_case_creation_status'
         },
         {
           key: 'ManageTestExecutionStatus',
-          url: 'https://frt4cnbr-5000.inc1.devtunnels.ms/test_execution_status'
+          url: 'http://localhost:5000/test_execution_status'
         },
         {
           key: 'ManageTotalDefectStatuses',
-          url: 'https://frt4cnbr-5000.inc1.devtunnels.ms/total_defect_status'
+          url: 'http://localhost:5000/total_defect_status'
         },
         {
           key: 'manageDefect',
-          url: 'https://frt4cnbr-5000.inc1.devtunnels.ms/new_defects'
+          url: 'http://localhost:5000/new_defects'
         }
       ];
 
@@ -327,7 +327,7 @@ const ManageTestCaseCreationStatus = () => {
     if (window.confirm('Are you sure you want to delete this status?')) {
       const token = sessionStorage.getItem('access_token');
       try {
-        const response = await axios.delete(`https://frt4cnbr-5000.inc1.devtunnels.ms/test_case_creation_status/${id}`, {
+        const response = await axios.delete(`http://localhost:5000/test_case_creation_status/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }

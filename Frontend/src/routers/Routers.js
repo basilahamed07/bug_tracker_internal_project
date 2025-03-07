@@ -67,7 +67,7 @@ const Routers = () => {
           <Route path="full_test_details/:projectNameId" element={<ProjectDetails />} /> {/* Dynamic Route */}
           <Route path="tester_count/:projectNameId" element={<TestersDetails />} />
           <Route path="project_metrics/:id" element={<ViewMatrix />} />
-          <Route path="ai_insist/:id" element={<Dashboard />} />
+          <Route path="ai_insist/:projectId" element={<Dashboard />} />
           <Route path="ScrumTeamDashboard" element={<ScrumTeamDashboard />} />
           <Route path="ScrumDetails" element={<ScrumDetails />} />
           <Route path="SprintStatus" element={<SprintStatus />} />
@@ -178,7 +178,7 @@ export default Routers;
 //   const fetchProjects = async () => {
 //     const token = sessionStorage.getItem('access_token');
 //     try {
-//       const response = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms/project-details-manager-view', {
+//       const response = await fetch('http://localhost:5000/project-details-manager-view', {
 //         headers: {
 //           'Authorization': `Bearer ${token}`,
 //           'Content-Type': 'application/json',
@@ -198,7 +198,7 @@ export default Routers;
 //   const fetchAllTesters = async () => {
 //     const token = sessionStorage.getItem('access_token');
 //     try {
-//       const response = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms/tester-billable', {
+//       const response = await fetch('http://localhost:5000/tester-billable', {
 //         headers: {
 //           'Authorization': `Bearer ${token}`,
 //           'Content-Type': 'application/json',
@@ -428,7 +428,7 @@ export default Routers;
 //   const fetchProjects = async () => {
 //     const token = sessionStorage.getItem('access_token');
 //     try {
-//       const response = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms/project-details-manager-view', {
+//       const response = await fetch('http://localhost:5000/project-details-manager-view', {
 //         headers: {
 //           'Authorization': `Bearer ${token}`,
 //           'Content-Type': 'application/json',

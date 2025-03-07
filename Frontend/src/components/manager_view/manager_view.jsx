@@ -21,7 +21,7 @@ const ManagerView = () => {
   const fetchProjects = async () => {
     const token = sessionStorage.getItem('access_token');
     try {
-      const response = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms/project-details-manager-view', {
+      const response = await fetch('http://localhost:5000/project-details-manager-view', {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',

@@ -36,7 +36,7 @@ const TestersDetails = () => {
         },
       };
 
-      const apiUrl = `https://frt4cnbr-5000.inc1.devtunnels.ms/project-base-billable/${projectId}`;
+      const apiUrl = `http://localhost:5000/project-base-billable/${projectId}`;
       const response = await axios.get(apiUrl, config);
 
       if (response.status === 200) {

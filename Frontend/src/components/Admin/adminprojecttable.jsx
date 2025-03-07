@@ -45,7 +45,7 @@
 //   useEffect(() => {
 //     const fetchProjects = async () => {
 //       try {
-//         const response = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms//project-details', {
+//         const response = await fetch('http://localhost:5000//project-details', {
 //           headers: {
 //             'Authorization': `Bearer ${sessionStorage.getItem('access_token')}`,
 //           },
@@ -92,7 +92,7 @@
 //   // Fetch users for billable and nonbillable based on the project data
 //   const fetchBillableAndNonBillable = async (billableIds, nonBillableIds) => {
 //     try {
-//       const response = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms//get_tester_details', {
+//       const response = await fetch('http://localhost:5000//get_tester_details', {
 //         method: 'POST',
 //         headers: {
 //           'Authorization': `Bearer ${sessionStorage.getItem('access_token')}`,
@@ -160,7 +160,7 @@
 
 //     // Send the updated project data to the backend
 //     try {
-//       const response = await fetch(`https://frt4cnbr-5000.inc1.devtunnels.ms//update-project-details/${selectedProject.id}`, {
+//       const response = await fetch(`http://localhost:5000//update-project-details/${selectedProject.id}`, {
 //         method: 'PUT',
 //         headers: {
 //           'Authorization': `Bearer ${sessionStorage.getItem('access_token')}`,
@@ -208,7 +208,7 @@
 //     const confirmDelete = window.confirm('Are you sure you want to delete this project?');
 //     if (confirmDelete) {
 //       try {
-//         const response = await fetch(`https://frt4cnbr-5000.inc1.devtunnels.ms//delete-project/${id}`, {
+//         const response = await fetch(`http://localhost:5000//delete-project/${id}`, {
 //           method: 'DELETE',
 //           headers: {
 //             'Authorization': `Bearer ${sessionStorage.getItem('access_token')}`,
@@ -278,7 +278,7 @@
   
 
 //   const handleGenerateReport = async (projectId, month) => {
-//     const url = `https://frt4cnbr-5000.inc1.devtunnels.ms/generate_pdf/${projectId}`; // API endpoint
+//     const url = `http://localhost:5000/generate_pdf/${projectId}`; // API endpoint
   
 //     setLoading(true); // Start loading when generating the report
 //     setError(''); // Reset any previous errors
@@ -805,7 +805,7 @@ const [selectedMonth, setSelectedMonth] = useState('');
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const response = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms//project-details', {
+        const response = await fetch('http://localhost:5000//project-details', {
           headers: {
             'Authorization': `Bearer ${sessionStorage.getItem('access_token')}`,
           },
@@ -822,7 +822,7 @@ const [selectedMonth, setSelectedMonth] = useState('');
 
   const fetchBillableAndNonBillable = async (billableIds, nonBillableIds) => {
     try {
-      const response = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms//get_tester_details', {
+      const response = await fetch('http://localhost:5000//get_tester_details', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${sessionStorage.getItem('access_token')}`,
@@ -907,7 +907,7 @@ const [selectedMonth, setSelectedMonth] = useState('');
 
     // Send the updated project data to the backend
     try {
-      const response = await fetch(`https://frt4cnbr-5000.inc1.devtunnels.ms//update-project-details/${selectedProject.id}`, {
+      const response = await fetch(`http://localhost:5000//update-project-details/${selectedProject.id}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${sessionStorage.getItem('access_token')}`,
@@ -958,7 +958,7 @@ const [selectedMonth, setSelectedMonth] = useState('');
     const confirmDelete = window.confirm('Are you sure you want to delete this project?');
     if (confirmDelete) {
       try {
-        const response = await fetch(`https://frt4cnbr-5000.inc1.devtunnels.ms//delete-project/${id}`, {
+        const response = await fetch(`http://localhost:5000//delete-project/${id}`, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${sessionStorage.getItem('access_token')}`,
@@ -986,7 +986,7 @@ const [selectedMonth, setSelectedMonth] = useState('');
     setShowAddTesterModal(true);
   
     try {
-      const response = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms//tester-billable', {
+      const response = await fetch('http://localhost:5000//tester-billable', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${sessionStorage.getItem('access_token')}`,
@@ -1073,7 +1073,7 @@ const [selectedMonth, setSelectedMonth] = useState('');
       return;
     }
   
-    const url = `https://frt4cnbr-5000.inc1.devtunnels.ms/generate_pdf/${projectId}`; // API endpoint with project ID
+    const url = `http://localhost:5000/generate_pdf/${projectId}`; // API endpoint with project ID
     console.log("Requesting report generation for project:", projectId, "and month:", selectedMonth);
   
     try {

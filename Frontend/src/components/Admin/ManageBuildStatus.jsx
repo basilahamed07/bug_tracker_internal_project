@@ -68,7 +68,7 @@ const ManageBuildStatus = () => {
 
     const token = sessionStorage.getItem('access_token');
     try {
-      const response = await axios.get(`https://frt4cnbr-5000.inc1.devtunnels.ms/build_status/${projectId}`, {
+      const response = await axios.get(`http://localhost:5000/build_status/${projectId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -84,7 +84,7 @@ const ManageBuildStatus = () => {
   const fetchUserProjects = async () => {
     const token = sessionStorage.getItem('access_token');
     try {
-      const response = await axios.get('https://frt4cnbr-5000.inc1.devtunnels.ms/get-user-projects', {
+      const response = await axios.get('http://localhost:5000/get-user-projects', {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -146,8 +146,8 @@ const ManageBuildStatus = () => {
     const token = sessionStorage.getItem('access_token');
     const method = editingStatus ? 'PUT' : 'POST';
     const url = editingStatus
-      ? `https://frt4cnbr-5000.inc1.devtunnels.ms/build_status/${editingStatus.id}`
-      : 'https://frt4cnbr-5000.inc1.devtunnels.ms/build_status';
+      ? `http://localhost:5000/build_status/${editingStatus.id}`
+      : 'http://localhost:5000/build_status';
 
     try {
       const response = await axios({
@@ -183,7 +183,7 @@ const ManageBuildStatus = () => {
     if (window.confirm('Are you sure you want to delete this status?')) {
       const token = sessionStorage.getItem('access_token');
       try {
-        const response = await axios.delete(`https://frt4cnbr-5000.inc1.devtunnels.ms/build_status/${id}`, {
+        const response = await axios.delete(`http://localhost:5000/build_status/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -218,7 +218,7 @@ const ManageBuildStatus = () => {
     // Fetch user projects when the "View" button is clicked
     const token = sessionStorage.getItem('access_token');
     try {
-      const response = await axios.get('https://frt4cnbr-5000.inc1.devtunnels.ms/get-user-projects', {
+      const response = await axios.get('http://localhost:5000/get-user-projects', {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -242,7 +242,7 @@ const ManageBuildStatus = () => {
   const handleViewDefects = async (projectId) => {
     const token = sessionStorage.getItem('access_token');
     try {
-      const response = await axios.get(`https://frt4cnbr-5000.inc1.devtunnels.ms/build_status/${projectId}`, {
+      const response = await axios.get(`http://localhost:5000/build_status/${projectId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'

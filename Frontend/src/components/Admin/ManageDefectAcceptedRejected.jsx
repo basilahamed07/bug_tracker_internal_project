@@ -78,7 +78,7 @@ const ManageDefectAcceptedRejected = () => {
     
     const token = sessionStorage.getItem('access_token');
     try {
-      const response = await axios.get(`https://frt4cnbr-5000.inc1.devtunnels.ms/defect_accepted_rejected/${projectId}`, {
+      const response = await axios.get(`http://localhost:5000/defect_accepted_rejected/${projectId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -93,7 +93,7 @@ const ManageDefectAcceptedRejected = () => {
   const fetchUserProjects = async () => {
     const token = sessionStorage.getItem('access_token');
     try {
-      const response = await axios.get('https://frt4cnbr-5000.inc1.devtunnels.ms/get-user-projects', {
+      const response = await axios.get('http://localhost:5000/get-user-projects', {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -114,7 +114,7 @@ const ManageDefectAcceptedRejected = () => {
   const fetchDefectsForProject = async (projectId) => {
     const token = sessionStorage.getItem('access_token');
     try {
-      const response = await axios.get(`https://frt4cnbr-5000.inc1.devtunnels.ms/defect_accepted_rejected/${projectId}`, {
+      const response = await axios.get(`http://localhost:5000/defect_accepted_rejected/${projectId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -178,8 +178,8 @@ const ManageDefectAcceptedRejected = () => {
     const token = sessionStorage.getItem('access_token');
     const method = editingStatus ? 'PUT' : 'POST';
     const url = editingStatus
-      ? `https://frt4cnbr-5000.inc1.devtunnels.ms/defect_accepted_rejected/${editingStatus.id}`
-      : 'https://frt4cnbr-5000.inc1.devtunnels.ms/defect_accepted_rejected';
+      ? `http://localhost:5000/defect_accepted_rejected/${editingStatus.id}`
+      : 'http://localhost:5000/defect_accepted_rejected';
 
     try {
       const response = await axios({
@@ -214,7 +214,7 @@ const ManageDefectAcceptedRejected = () => {
     if (window.confirm('Are you sure you want to delete this status?')) {
       const token = sessionStorage.getItem('access_token');
       try {
-        const response = await axios.delete(`https://frt4cnbr-5000.inc1.devtunnels.ms/defect_accepted_rejected/${id}`, {
+        const response = await axios.delete(`http://localhost:5000/defect_accepted_rejected/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -320,7 +320,7 @@ const ManageDefectAcceptedRejected = () => {
       
   //     const response = await axios({
   //       method: 'POST',
-  //       url: 'https://frt4cnbr-5000.inc1.devtunnels.ms/defect_accepted_rejected',
+  //       url: 'http://localhost:5000/defect_accepted_rejected',
   //       headers: {
   //         Authorization: `Bearer ${token}`,
   //         'Content-Type': 'application/json'
