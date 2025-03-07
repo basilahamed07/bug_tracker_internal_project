@@ -1,6 +1,6 @@
 from flask import jsonify, request
 from werkzeug.security import generate_password_hash, check_password_hash
-from models import db,Users,Project_name,Project_details,New_defects,Total_Defect_Status,Test_execution_status,Testers,TestCaseCreationStatus,DefectAcceptedRejected,BuildStatus,Tester_name,Metrics,AgileDetails,SprintDetails,TestingType
+from models import db,Users,Project_name,Project_details,New_defects,Total_Defect_Status,Test_execution_status,Testers,TestCaseCreationStatus,DefectAcceptedRejected,BuildStatus,Tester_name,Metrics,AgileDetails,SprintDetails,TestingType,StoryDetails
 from flask_jwt_extended import create_access_token,jwt_required,get_jwt_identity
 import os
 from datetime import date
@@ -121,60 +121,67 @@ def project_details_route(app):
     def delete_project(id):
         try:
             user_id = int(get_jwt_identity())  # Get user ID from JWT token
-
+    
             # Fetch the project details based on the provided project ID
             project_details = Project_details.query.filter_by(id=id).first()
-
+    
             if not project_details:
                 return jsonify({"message": "Project not found"}), 404
-
+    
             project_name_id = project_details.project_name_id
-
-            # Fetch all related entities using the project_name_id
+    
+            # Ensure that project_name_id is not None
+            if not project_name_id:
+                return jsonify({"message": "Project's project_name_id is missing"}), 400
+    
+            # Fetch the project name record and related entities using the project_name_id
             project_name = Project_name.query.filter_by(id=project_name_id).first()
             testers = Testers.query.filter_by(project_name_id=project_name_id).all()
             build_status = BuildStatus.query.filter_by(project_name_id=project_name_id).all()
             defect_accept_reject = DefectAcceptedRejected.query.filter_by(project_name_id=project_name_id).all()
             new_defects = New_defects.query.filter_by(project_name_id=project_name_id).all()
-            test_case_creation_status = TestCaseCreationStatus.query.filter_by(project_name_id=project_name_id).all()
+            test_case_creation_status = TestCaseCreationStatus.query.filter_by(project_name_id=project_name_id).all ()
             test_execution_status = Test_execution_status.query.filter_by(project_name_id=project_name_id).all()
             total_defect_status = Total_Defect_Status.query.filter_by(project_name_id=project_name_id).all()
             metrics_input = Metrics.query.filter_by(project_name_id=project_name_id).all()
             agile_details = AgileDetails.query.filter_by(project_name_id=project_name_id).all()
             sprint_details = SprintDetails.query.filter_by(project_name_id=project_name_id).all()
             tester_type = TestingType.query.filter_by(project_name_id=project_name_id).all()
-
+    
             # Deleting related records
             related_records = [
                 metrics_input, testers, build_status, defect_accept_reject, new_defects,
                 test_case_creation_status, test_execution_status, total_defect_status,
-                agile_details, sprint_details, tester_type
+                agile_details, tester_type
             ]
-
-            for records in related_records:
-                for record in records:
-                    db.session.delete(record)
-
-            # Deleting the project details related to the project
-            db.session.delete(project_details)
-
-            # Deleting the project name record
-            if project_name:
-                db.session.delete(project_name)
-
-            # Commit the transaction
-            db.session.commit()
-
+    
+            with db.session.no_autoflush:
+                for records in related_records:
+                    for record in records:
+                        db.session.delete(record)
+    
+                # Delete related StoryDetails for each SprintDetails
+                for sprint in sprint_details:
+                    story_details = StoryDetails.query.filter_by(sprint_detail_id=sprint.id).all()
+                    for story in story_details:
+                        db.session.delete(story)
+                    db.session.delete(sprint)
+    
+                # Deleting the project details related to the project
+                db.session.delete(project_details)
+    
+                # Deleting the project name record
+                if project_name:
+                    db.session.delete(project_name)
+    
+                # Commit the transaction
+                db.session.commit()
+    
             return jsonify({"message": "Project and all related data deleted successfully"}), 200
-
+    
         except Exception as e:
             db.session.rollback()
             return jsonify({"error": f"An error occurred while deleting the project: {str(e)}"}), 500
-
-
-
-
-
 # -----------------------------------------code ----------------------------------------------------
     @app.route("/update-project/<int:id>", methods=["PUT"])
     @jwt_required()

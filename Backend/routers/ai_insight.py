@@ -3,10 +3,49 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from datetime import date
 from sqlalchemy import create_engine, distinct
 from models import db, Project_name, Testers, Tester_name
+from langchain_groq import ChatGroq
+import os
+from dotenv import load_dotenv
+from langgraph.graph import START, END, StateGraph
+from langgraph.graph.message import add_messages
+from typing_extensions import TypedDict
+from models import db,Users,Project_name,Project_details,New_defects,Total_Defect_Status,Test_execution_status,Testers,TestCaseCreationStatus,DefectAcceptedRejected,BuildStatus,Tester_name,Metrics,AgileDetails,SprintDetails,TestingType
+from langchain_core.prompts import ChatPromptTemplate
+
+
+load_dotenv()
+groq_api = os.getenv("groq_api_key")
+
+
+llm = ChatGroq(temperature=0, groq_api_key=groq_api, model_name="llama-3.3-70b-versatile")
+
+system = "your giving the the summer for the project for 1 passage"
+
+#defing the chatprompttenplate
+pompt = ChatPromptTemplate.from_messages(["system", system,("placeholder", "{userinput}")])
+
+llm_with_prompt = pompt | llm
+class State(TypedDict):
+    userinput: str
+
+#node define 
+def llm_call(state:State):
+    return llm_with_prompt.invoke(state["userinput"])
+
+# define the workflow
+
+workflow = StateGraph(State)
+workflow.add_node("llm_call", llm_call)
+workflow.add_edge(START, "llm_call")
+workflow.add_edge("llm_call", END)
+
+llm_graph = workflow.compile()
+
 
 def ai_insight_router(app):
     @app.route('/ai_insight', methods=['GET'])
     def ai_insight_route():
+        
         ai_insight_data = {
             "summaryData": 
                 """SixData is an advanced data visualization and analytics project aimed at helping businesses extract actionable insights from vast datasets. 
@@ -67,6 +106,27 @@ def ai_insight_router(app):
         }
 
         return jsonify(ai_insight_data)
+    @app.route('/ai_insight/<int:id>', methods=['GET'])
+    def ai_inside_summery(id):
+        #get the all the values accoding to the project
 
+        database_collection = [Project_details,New_defects,Total_Defect_Status,Test_execution_status,Testers,TestCaseCreationStatus,DefectAcceptedRejected,BuildStatus,Metrics,AgileDetails,SprintDetails,TestingType]
+        final_output = {}
+        project_name = Project_name.query.filter_by(id=id).first()
+
+        for trash in database_collection:
+            test = trash.query.filter_by(project_name_id=id).first()
+            if test is not None:
+                final_output[trash.__tablename__] = test.to_dict()
+
+        print(final_output)
+        response = llm_graph.invoke({"userinput":"hello"})
+        print(response.content)
+        return jsonify(response.content)
+        
+       
+
+
+        
     # This makes sure the endpoint '/ai_insight' is linked to the function ai_insight_route.
     app.add_url_rule('/ai_insight', view_func=ai_insight_route, methods=['GET'])

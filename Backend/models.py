@@ -20,18 +20,17 @@ class Users(db.Model):
             'password': self.password,
             'role': self.role
         }
-
-# For project name table
+# Project_name model
 class Project_name(db.Model):
     __tablename__ = 'project_name'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    project_name = db.Column(db.String(100), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    user = db.relationship("Users", backref="Project_name")
-
-
-    #for relactionship for edlete the project 
     
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    project_name = db.Column(db.String(100), nullable=False, unique=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    user = db.relationship("Users", backref="project_names")
+
+    # Define the relationship with Project_details
+    project_details = db.relationship("Project_details", backref="related_project_name", cascade="all, delete-orphan")
 
     def to_dict(self):
         return {
@@ -40,26 +39,25 @@ class Project_name(db.Model):
             "user_id": self.user_id
         }
 
+# Project_details model
 class Project_details(db.Model):
     __tablename__ = 'project_details'
-    
+
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     project_name_id = db.Column(db.Integer, db.ForeignKey("project_name.id"), nullable=False)
     rag = db.Column(db.String(100), nullable=False)
     tester_count = db.Column(db.Integer, nullable=False)
-    billable = db.Column(ARRAY(db.Integer), nullable=False)
-    nonbillable = db.Column(ARRAY(db.Integer), nullable=False)
+    billable = db.Column(db.ARRAY(db.Integer), nullable=False)
+    nonbillable = db.Column(db.ARRAY(db.Integer), nullable=False)
     billing_type = db.Column(db.String(100), nullable=False)
     automation = db.Column(db.String(100), nullable=False, default="Nil")
     ai_used = db.Column(db.String(100), nullable=False, default="Nil")
     rag_details = db.Column(db.String(100), nullable=False, default="Nil")
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    
-    # Adding the "again" column with a default value of False
     agile = db.Column(db.Boolean, nullable=True)
-    
-    # Relationship
-    project_name = db.relationship("Project_name", backref="project_details")
+
+    # Define the relationship to Project_name without delete-orphan
+    project_name = db.relationship("Project_name", backref="project_details_list")
     user = db.relationship("Users", backref="project_details")
 
     def to_dict(self):
@@ -75,9 +73,8 @@ class Project_details(db.Model):
             'ai_used': self.ai_used,
             'rag_details': self.rag_details,
             "user_id": self.user_id,
-            'agile': self.agile  # Including the new "again" column
+            'agile': self.agile
         }
-
     
 class Testers(db.Model):
     __tablename__ = 'testers'
