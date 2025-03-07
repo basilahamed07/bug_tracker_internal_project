@@ -213,8 +213,8 @@ export default function AddProjectWithDetails({ projectNameProp }) {
         return;
       }
 
-      const response = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms/tester-billable', {
-        // const response = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms/tester-billable', {
+      const response = await fetch('http://localhost:5000/tester-billable', {
+        // const response = await fetch('http://localhost:5000/tester-billable', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -323,7 +323,7 @@ export default function AddProjectWithDetails({ projectNameProp }) {
         project_name: selectedProject ? selectedProject : projectName,
       };
 
-      const response = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms/create-project', {
+      const response = await fetch('http://localhost:5000/create-project', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -454,8 +454,8 @@ sessionStorage.setItem('projectID', projectDataResponse.project_id);
         })),
       ];
       
-      const createTestersResponse = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms/tester-billable', {
-        // const createTestersResponse = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms/tester-billable', {
+      const createTestersResponse = await fetch('http://localhost:5000/tester-billable', {
+        // const createTestersResponse = await fetch('http://localhost:5000/tester-billable', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -500,7 +500,7 @@ sessionStorage.setItem('projectID', projectDataResponse.project_id);
   
       console.log('Submitting payload:', projectDetailsPayload);
   
-      const response = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms/create-project-details', {
+      const response = await fetch('http://localhost:5000/create-project-details', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -560,7 +560,7 @@ sessionStorage.setItem('projectID', projectDataResponse.project_id);
         return;
       }
 
-      const response3 = await axios.get('https://frt4cnbr-5000.inc1.devtunnels.ms/pending-project', {
+      const response3 = await axios.get('http://localhost:5000/pending-project', {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },

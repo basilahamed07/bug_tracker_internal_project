@@ -24,7 +24,7 @@ const ScrumDetails = () => {
                 
                 // Fetch scrum details
                 const scrumResponse = await axios.get(
-                  `https://frt4cnbr-5000.inc1.devtunnels.ms/agile_details/${project_name_id}`,
+                  `http://localhost:5000/agile_details/${project_name_id}`,
                   {
                     headers: {
                       Authorization: `Bearer ${token}`,
@@ -38,7 +38,7 @@ const ScrumDetails = () => {
         
                 // Fetch billable status with updated handling
                 const billableResponse = await axios.get(
-                  `https://frt4cnbr-5000.inc1.devtunnels.ms/project-base-billable/${project_name_id}`,
+                  `http://localhost:5000/project-base-billable/${project_name_id}`,
                   {
                     headers: {
                       Authorization: `Bearer ${token}`,

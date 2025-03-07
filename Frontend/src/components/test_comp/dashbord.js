@@ -18,7 +18,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     // Fetch data from backend
-    axios.get("https://frt4cnbr-5000.inc1.devtunnels.ms/ai_insight")
+    axios.get("http://localhost:5000/ai_insight")
       .then(response => {
         const { summaryData, lineData, pieData, tableData } = response.data;
         setSummary(summaryData);

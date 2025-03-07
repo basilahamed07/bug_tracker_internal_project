@@ -26,7 +26,7 @@ const ScrumBuzz = () => {
   const fetchUserProjects = async () => {
     const token = sessionStorage.getItem('access_token');
     try {
-      const response = await axios.get('https://frt4cnbr-5000.inc1.devtunnels.ms/get-user-projects', {
+      const response = await axios.get('http://localhost:5000/get-user-projects', {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -42,7 +42,7 @@ const ScrumBuzz = () => {
   const fetchScrums = async (projectId) => {
     const token = sessionStorage.getItem('access_token');
     try {
-      const response = await axios.get(`https://frt4cnbr-5000.inc1.devtunnels.ms/agile_details/${projectId}`, {
+      const response = await axios.get(`http://localhost:5000/agile_details/${projectId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -58,7 +58,7 @@ const ScrumBuzz = () => {
   const fetchExistingPIs = async (scrumId) => {
     const token = sessionStorage.getItem('access_token');
     try {
-      const response = await axios.get(`https://frt4cnbr-5000.inc1.devtunnels.ms/get_pl_name/${scrumId}`, {
+      const response = await axios.get(`http://localhost:5000/get_pl_name/${scrumId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
