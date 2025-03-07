@@ -67,7 +67,7 @@ const Routers = () => {
           <Route path="full_test_details/:projectNameId" element={<ProjectDetails />} /> {/* Dynamic Route */}
           <Route path="tester_count/:projectNameId" element={<TestersDetails />} />
           <Route path="project_metrics/:id" element={<ViewMatrix />} />
-          <Route path="ai_insist/:id" element={<Dashboard />} />
+          <Route path="ai_insist/:projectId" element={<Dashboard />} />
           <Route path="ScrumTeamDashboard" element={<ScrumTeamDashboard />} />
           <Route path="ScrumDetails" element={<ScrumDetails />} />
           <Route path="SprintStatus" element={<SprintStatus />} />
