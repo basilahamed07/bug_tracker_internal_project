@@ -1,15 +1,3 @@
-// // App.js
-// import Layout from "./components/Layout/Layout";
-// function App() {
-  
-//   return <Layout />;
-  
-// }
-
-// export default App;
-
-
-
 // src/App.js
 import React from 'react';
 import { Provider } from 'react-redux'; // Import the Provider from react-redux
