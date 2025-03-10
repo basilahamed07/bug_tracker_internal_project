@@ -24,7 +24,7 @@
 //   const fetchDefects = async (project_name_id) => {
 //     const token = sessionStorage.getItem('access_token');
 //     try {
-//       const response = await axios.get(`https://frt4cnbr-5000.inc1.devtunnels.ms/new_defects/${project_name_id}`, {
+//       const response = await axios.get(`http://localhost:5000/new_defects/${project_name_id}`, {
 //         headers: {
 //           Authorization: `Bearer ${token}`,
 //           'Content-Type': 'application/json'
@@ -39,7 +39,7 @@
 //   const fetchUserProjects = async () => {
 //     const token = sessionStorage.getItem('access_token');
 //     try {
-//       const response = await axios.get('https://frt4cnbr-5000.inc1.devtunnels.ms/get-user-projects', {
+//       const response = await axios.get('http://localhost:5000/get-user-projects', {
 //         headers: {
 //           Authorization: `Bearer ${token}`,
 //           'Content-Type': 'application/json'
@@ -56,7 +56,7 @@
 //     setLoading(true); // Set loading state when scrum details are being fetched
 //     const token = sessionStorage.getItem('access_token');
 //     try {
-//       const response = await axios.get(`https://frt4cnbr-5000.inc1.devtunnels.ms/agile_details/${project_name_id}`, {
+//       const response = await axios.get(`http://localhost:5000/agile_details/${project_name_id}`, {
 //         headers: {
 //           Authorization: `Bearer ${token}`,
 //           'Content-Type': 'application/json'
@@ -198,7 +198,7 @@ const AdminScrumBuzz = () => {
   const fetchDefects = async (project_name_id) => {
     const token = sessionStorage.getItem('access_token');
     try {
-      const response = await axios.get(`https://frt4cnbr-5000.inc1.devtunnels.ms/new_defects/${project_name_id}`, {
+      const response = await axios.get(`http://localhost:5000/new_defects/${project_name_id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -213,7 +213,7 @@ const AdminScrumBuzz = () => {
   const fetchUserProjects = async () => {
     const token = sessionStorage.getItem('access_token');
     try {
-      const response = await axios.get('https://frt4cnbr-5000.inc1.devtunnels.ms/get-user-projects', {
+      const response = await axios.get('http://localhost:5000/get-user-projects', {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -230,7 +230,7 @@ const AdminScrumBuzz = () => {
     setLoading(true); // Set loading state when scrum details are being fetched
     const token = sessionStorage.getItem('access_token');
     try {
-      const response = await axios.get(`https://frt4cnbr-5000.inc1.devtunnels.ms/agile_details/${project_name_id}`, {
+      const response = await axios.get(`http://localhost:5000/agile_details/${project_name_id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'

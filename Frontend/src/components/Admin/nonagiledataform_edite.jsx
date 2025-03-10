@@ -29,7 +29,7 @@
     
 //     // Fetch the latest 5 testing types for the project
 //     axios
-//       .get(`https://frt4cnbr-5000.inc1.devtunnels.ms/testing-type/${projectId}`, {
+//       .get(`http://localhost:5000/testing-type/${projectId}`, {
 //         headers: {
 //           Authorization: `Bearer ${accessToken}`,
 //         },
@@ -248,7 +248,7 @@ const TestingTypeTable = () => {
 
     // Fetch the latest 5 testing types for the project
     axios
-      .get(`https://frt4cnbr-5000.inc1.devtunnels.ms/testing-type/${projectId}`, {
+      .get(`http://localhost:5000/testing-type/${projectId}`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -281,7 +281,7 @@ const TestingTypeTable = () => {
   const handleDeleteClick = (id) => {
     if (window.confirm('Are you sure you want to delete this record?')) {
       axios
-        .delete(`https://frt4cnbr-5000.inc1.devtunnels.ms/testing-type/${id}`, {
+        .delete(`http://localhost:5000/testing-type/${id}`, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
@@ -306,7 +306,7 @@ const TestingTypeTable = () => {
     }
 
     axios
-      .put(`https://frt4cnbr-5000.inc1.devtunnels.ms/testing-type/${selectedTest.id}`, formData, {
+      .put(`http://localhost:5000/testing-type/${selectedTest.id}`, formData, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },

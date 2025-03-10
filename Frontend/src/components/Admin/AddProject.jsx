@@ -7,7 +7,8 @@ import "./AddProject.css"
 import { useDispatch, useSelector } from 'react-redux';
 import { validateField } from '../validation/store';  
 import { validateProjectName, validateConfirmProjectName } from './validation';
-const AddProjectWithDetails = ({ projectNameProp }) => {
+
+export default function AddProjectWithDetails({ projectNameProp }) {
   const [projectName, setProjectName] = useState(projectNameProp);
   const [confirmProjectName, setConfirmProjectName] = useState('');
   const [isPending, setIsPending] = useState(false);
@@ -26,9 +27,127 @@ const AddProjectWithDetails = ({ projectNameProp }) => {
   const [loading, setLoading] = useState(false);
   const [selectedProject, setSelectedProject] = useState('');
 
+  const [formErrors, setFormErrors] = useState({
+    projectName: '',
+    confirmProjectName: '',
+    rag: '',
+    rag_details: '',
+    billing_type: '',
+    tester_count: '',
+    automation: '',
+    ai_used: '',
+    agile_type: '',
+    billable: '',
+    nonbillable: ''
+  });
+
+  const validateField = (name, value) => {
+    let error = '';
+  
+    // Check if value is a string before calling trim()
+    const safeValue = typeof value === 'string' ? value.trim() : '';
+  
+    switch (name) {
+      case 'projectName':
+        if (!safeValue) {
+          error = 'Project name is required';
+        } else if (safeValue.length < 3) {
+          error = 'Project name must be at least 3 characters';
+        }
+        break;
+  
+      case 'confirmProjectName':
+        if (!safeValue) {
+          error = 'Please confirm project name';
+        } else if (safeValue !== projectName) {
+          error = 'Project names do not match';
+        }
+        break;
+  
+      case 'rag':
+        if (!value) {
+          error = 'Please select a RAG status';
+        }
+        break;
+  
+      case 'rag_details':
+        if (!safeValue) {
+          error = 'RAG details are required';
+        }
+        break;
+  
+      case 'billing_type':
+        if (!value) {
+          error = 'Please select a billing type';
+        }
+        break;
+  
+      case 'agile_type':
+        if (!value) {
+          error = 'Please select a project type';
+        }
+        break;
+  
+      case 'billable':
+        if (!value || value.length === 0) {
+          error = 'At least one billable tester is required';
+        }
+        break;
+  
+      case 'nonbillable':
+        if (!value || value.length === 0) {
+          error = 'At least one non-billable tester is required';
+        }
+        break;
+  
+      case 'automation':
+        if (!value) {
+          error = 'Please select whether automation is used';
+        }
+        break;
+  
+      case 'ai_used':
+        if (!value) {
+          error = 'Please select whether AI is used';
+        }
+        break;
+  
+      default:
+        break;
+    }
+  
+    return error;
+  };
+  
+
+  const handleBlur = (fieldName, value) => {
+    let error = '';
+    
+    if (fieldName === 'projectName' || fieldName === 'confirmProjectName') {
+      // Create a proper action object instead of dispatching string
+      dispatch({
+        type: 'VALIDATE_FIELD',
+        payload: {
+          field: fieldName,
+          error: fieldName === 'projectName' 
+            ? validateProjectName(projectName, confirmProjectName)
+            : validateConfirmProjectName(confirmProjectName)
+        }
+      });
+    } 
+  
+    // Form validation for other fields
+    error = validateField(fieldName, value);
+  
+    // Update form errors state
+    setFormErrors(prev => ({
+      ...prev,
+      [fieldName]: error
+    }));
+  };
 
   // const { setSelectedProject } = useProject();  // Access the setSelectedProject function
-
+  
 
   const navigate = useNavigate(); // Initialize useNavigate hook
 
@@ -40,8 +159,10 @@ const AddProjectWithDetails = ({ projectNameProp }) => {
     nonbillable: [],
     billing_type: '',
     rag_details: '',
-    automation: false,
-    ai_used: false,
+    automation: 'No',  // Set default value
+    ai_used: 'No',    // Set default value
+    automation_details: null,
+    ai_used_details: null,
     agile_type: ''
 
   });
@@ -83,19 +204,6 @@ const AddProjectWithDetails = ({ projectNameProp }) => {
   const dispatch = useDispatch();
   const { errors } = useSelector((state) => state.formValidation);
 
-  const handleBlur = (field) => {
-    let error = '';
-    if (field === 'projectName') {
-      error = validateProjectName(projectName, confirmProjectName);
-    } else if (field === 'confirmProjectName') {
-      error = validateConfirmProjectName(confirmProjectName);
-    }
-
-    // Dispatch the validation error to Redux store
-    dispatch(validateField({ field, error }));
-  };
-
-
   const fetchTesters = async () => {
     setLoadingTesters(true);
     try {
@@ -105,8 +213,8 @@ const AddProjectWithDetails = ({ projectNameProp }) => {
         return;
       }
 
-      const response = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms/tester-billable', {
-        // const response = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms/tester-billable', {
+      const response = await fetch('http://localhost:5000/tester-billable', {
+        // const response = await fetch('http://localhost:5000/tester-billable', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -165,9 +273,40 @@ const AddProjectWithDetails = ({ projectNameProp }) => {
     setFormData({ ...formData, tester_count: totalCount });
   };
 
+  const isFormValid = () => {
+    const errors = {
+      projectName: validateField('projectName', projectName),
+      confirmProjectName: validateField('confirmProjectName', confirmProjectName),
+      rag: validateField('rag', formData.rag),
+      rag_details: validateField('rag_details', formData.rag_details),
+      billing_type: validateField('billing_type', formData.billing_type),
+      agile_type: validateField('agile_type', formData.agile_type),
+      billable: validateField('billable', selectedTesters.billable),
+      nonbillable: validateField('nonbillable', selectedTesters.nonbillable),
+      automation: validateField('automation', formData.automation || 'No'),
+      ai_used: validateField('ai_used', formData.ai_used || 'No')
+    };
+  
+    setFormErrors(errors);
+    return !Object.values(errors).some(error => error !== '');
+  };
 
   const handleProjectSubmit = async (e) => {
     e.preventDefault();
+
+    // Validate all fields before submission
+    const projectNameError = validateField('projectName', projectName);
+    const confirmProjectNameError = validateField('confirmProjectName', confirmProjectName);
+
+    setFormErrors(prev => ({
+      ...prev,
+      projectName: projectNameError,
+      confirmProjectName: confirmProjectNameError
+    }));
+
+    if (projectNameError || confirmProjectNameError) {
+      return; // Stop submission if there are errors
+    }
 
     if (projectName !== confirmProjectName) {
       setError('Project names do not match.');
@@ -184,7 +323,7 @@ const AddProjectWithDetails = ({ projectNameProp }) => {
         project_name: selectedProject ? selectedProject : projectName,
       };
 
-      const response = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms/create-project', {
+      const response = await fetch('http://localhost:5000/create-project', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -234,30 +373,71 @@ sessionStorage.setItem('projectID', projectDataResponse.project_id);
 
   // Handle Submit (Trigger Popup)
   const handleSubmitClick = (e) => {
-    e.preventDefault(); // Prevent form submission immediately
-    setShowPopup(true); // Show the confirmation popup
+    e.preventDefault();
+    
+    // Check all required fields
+    const allErrors = {
+      rag: validateField('rag', formData.rag),
+      rag_details: validateField('rag_details', formData.rag_details),
+      billing_type: validateField('billing_type', formData.billing_type),
+      agile_type: validateField('agile_type', formData.agile_type),
+      automation: validateField('automation', formData.automation || 'No'),
+      ai_used: validateField('ai_used', formData.ai_used || 'No'),
+      billable: validateField('billable', selectedTesters.billable),
+      nonbillable: validateField('nonbillable', selectedTesters.nonbillable)
+    };
+  
+    setFormErrors(allErrors);
+  
+    // Check if any validation errors exist
+    const hasErrors = Object.values(allErrors).some(error => error !== '');
+    
+    if (hasErrors) {
+      setErrorMessage("Please fix all validation errors before submitting.");
+      return;
+    }
+  
+    // Check if all required fields are filled
+    const requiredFields = {
+      rag: formData.rag,
+      rag_details: formData.rag_details,
+      billing_type: formData.billing_type,
+      agile_type: formData.agile_type,
+      automation: formData.automation,
+      ai_used: formData.ai_used,
+      billable: selectedTesters.billable.length > 0,
+      nonbillable: selectedTesters.nonbillable.length > 0
+    };
+  
+    const missingFields = Object.entries(requiredFields)
+      .filter(([_, value]) => !value)
+      .map(([field]) => field);
+  
+    if (missingFields.length > 0) {
+      setErrorMessage(`Please fill in the following fields: ${missingFields.join(', ')}`);
+      return;
+    }
+  
+    // If all validations pass, show the confirmation popup
+    setShowPopup(true);
   };
-
+  
 
   const handlePopupCancel = () => {
     setShowPopup(false); // Close the popup without submitting
   };
 
   const handleProjectDetailsSubmit = async (e) => {
-    e.preventDefault();
-
+    if (e) {
+      e.preventDefault();
+    }
+  
     try {
       const accessToken = sessionStorage.getItem('access_token');
       if (!accessToken) throw new Error('User is not authenticated');
-
+  
       setIsPending(true);
-
-          // Determine the project name (either selectedProject or projectName)
-    const projectNameToStore = selectedProject ? selectedProject : projectName;
-    
-    // Set the project name in sessionStorage
-    sessionStorage.setItem('projectName', projectNameToStore);  // Store project name with key 'projectName'
-
+      setErrorMessage(''); // Clear any previous error messages
 
       const testersToSubmit = [
         ...selectedTesters.billable.map(tester => ({
@@ -273,9 +453,9 @@ sessionStorage.setItem('projectID', projectDataResponse.project_id);
           billable: false,
         })),
       ];
-
-      const createTestersResponse = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms/tester-billable', {
-        // const createTestersResponse = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms/tester-billable', {
+      
+      const createTestersResponse = await fetch('http://localhost:5000/tester-billable', {
+        // const createTestersResponse = await fetch('http://localhost:5000/tester-billable', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -291,44 +471,36 @@ sessionStorage.setItem('projectID', projectDataResponse.project_id);
       const testersResponseData = await createTestersResponse.json();
       console.log('Testers created successfully:', testersResponseData);
 
+      // Prepare the payload
       const projectDetailsPayload = {
-        // project_name: projectName,
-        project_name_id : formData.project_name_id,
         project_name: selectedProject ? selectedProject : projectName,
+        project_name_id: sessionStorage.getItem('projectID'), // Get from sessionStorage
         rag: formData.rag,
-        tester_count: formData.tester_count,
-        testers: testersToSubmit,
-        billing_type: formData.billing_type,
         rag_details: formData.rag_details,
-        // automation: formData.automation === 'Yes',
-        // ai_used: formData.ai_used === 'Yes',
-        automation_details: formData.automation === 'Yes' ? formData.automation_details : '',
-        ai_used_details: formData.ai_used === 'Yes' ? formData.ai_used_details : '',
-        agile_type : formData.agile_type === 'Agile' ? true : false
+        billing_type: formData.billing_type,
+        tester_count: formData.tester_count,
+        automation: formData.automation,
+        ai_used: formData.ai_used,
+        automation_details: formData.automation === 'Yes' ? formData.automation_details : "No Automation is used here",
+        ai_used_details: formData.ai_used === 'Yes' ? formData.ai_used_details : "No ai used here",
+        agile_type: formData.agile_type === 'Agile' ? true : false,
+        testers: [
+          ...selectedTesters.billable.map(tester => ({
+            tester_name: tester.tester_name,
+            project_name: selectedProject ? selectedProject : projectName,
+            billable: true
+          })),
+          ...selectedTesters.nonbillable.map(tester => ({
+            tester_name: tester.tester_name,
+            project_name: selectedProject ? selectedProject : projectName,
+            billable: false
+          }))
+        ]
       };
-
-      // Validation: Check if all required fields are filled
-      const requiredFields = [
-        formData.rag,
-        formData.rag_details,
-        formData.billing_type,
-        formData.automation,
-        formData.ai_used,
-        formData.agile_type,
-        selectedTesters.billable.length > 0, // Ensure at least one billable tester is selected
-        selectedTesters.nonbillable.length > 0, // Ensure at least one non-billable tester is selected
-      ];
-
-      // Check if any required field is missing or empty
-      const allFieldsValid = requiredFields.every(field => field !== "" && field !== undefined && field !== null);
-
-      if (!allFieldsValid) {
-        setErrorMessage("Please fill in all required fields.");
-        return; // Stop the form submission if validation fails
-      }
-
-      const response2 = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms/create-project-details', {
-        // const response2 = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms/create-project-details', {
+  
+      console.log('Submitting payload:', projectDetailsPayload);
+  
+      const response = await fetch('http://localhost:5000/create-project-details', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -336,66 +508,42 @@ sessionStorage.setItem('projectID', projectDataResponse.project_id);
         },
         body: JSON.stringify(projectDetailsPayload),
       });
-
-      // if (!response2.ok) throw new Error('Project details creation failed');
-
-      // const projectDetailsResponse = await response2.json();
-      // setSuccessMessage('Project details created successfully!');
-
-      if (response2.ok) {
-        // If POST request is successful, show success message
-        setSuccessMessage('Project details updated successfully!');
-        setShowPopup(false);
-        setShowSuccessPopup(true);
-
-
-          // Set sessionStorage to indicate project flow is 'True'
-          sessionStorage.setItem('projectFlow', 'True');
-          sessionStorage.setItem('project_name_id', formData.project_name_id);
-
-
-
-
-
-
-          setTimeout(() => {
-            // Retrieve agileType from sessionStorage
-            const agileType = sessionStorage.getItem('agileType');
-          
-            // Check if agileType is defined and proceed with navigation logic
-            if (agileType !== null) {
-              if (agileType === 'true') {
-                navigate('/TestLead/ScrumTeamManagement');
-              } else {
-                navigate('/TestLead/NonAgileForm');
-              }
-            } else {
-              // Handle the case where agileType is not found in sessionStorage
-              console.error('agileType is not defined in sessionStorage');
-              setErrorMessage('Error: agileType not found in session storage.');
-            }
-          }, 1000); // 1-second delay before navigating
-          
-      } else {
-        // Handle failure if needed (e.g., show an error message)
-        setSuccessMessage('Failed to update project details. Please try again.');
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to submit project details');
       }
-
-      // Clear session data after completing the form
-      // sessionStorage.removeItem('isProjectCreated');
-      sessionStorage.removeItem('formData');
-
+  
+      const responseData = await response.json();
+      console.log('Success response:', responseData);
+  
+      // Show success message and handle navigation
+      setSuccessMessage('Project details updated successfully!');
+      setShowPopup(false);
+      setShowSuccessPopup(true);
+  
+      // Set session storage values
+      sessionStorage.setItem('projectFlow', 'True');
+      sessionStorage.setItem('selectedProject', selectedProject ? selectedProject : projectName);
+      
+      // Navigate after short delay
+      setTimeout(() => {
+        const agileType = sessionStorage.getItem('agileType');
+        if (agileType === 'true') {
+          navigate('/TestLead/ScrumTeamManagement');
+        } else {
+          navigate('/TestLead/NonAgileForm');
+        }
+      }, 1000);
+  
     } catch (error) {
-      setError('Error creating project details: ' + error.message);
+      console.error('Submission error:', error);
+      setErrorMessage(`Error submitting project details: ${error.message}`);
     } finally {
       setIsPending(false);
     }
-
-
-
-    // setSuccessMessage('Project details submitted successfully!');
-    setShowCreateDetails(false); // Hide the form after successful submission
   };
+  
 
   
 
@@ -412,7 +560,7 @@ sessionStorage.setItem('projectID', projectDataResponse.project_id);
         return;
       }
 
-      const response3 = await axios.get('https://frt4cnbr-5000.inc1.devtunnels.ms/pending-project', {
+      const response3 = await axios.get('http://localhost:5000/pending-project', {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -445,17 +593,25 @@ sessionStorage.setItem('projectID', projectDataResponse.project_id);
     }
   };
 
+  // Add this validation function
+  const validateSelectedProject = (project) => {
+    if (!project) {
+      return 'Please select a project';
+    }
+    return '';
+  };
 
-
-
-  // Update this function to handle the project update button click
+  // Update the handleProjectUpdate function
   const handleProjectUpdate = (project) => {
-    // console.log(project.project_name)
-    setProjectName(project.project_name); // Set the project name from the selected pending project
-
-    setSelectedProject(project); // Set the selected project
-
-    // If you want to show the "Create Project Details Form" after clicking update
+    const validationError = validateSelectedProject(project);
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+  
+    setProjectName(project.project_name);
+    setSelectedProject(project);
+    setError(''); // Clear any existing errors
     setShowCreateDetails(true);
   };
 
@@ -509,7 +665,11 @@ sessionStorage.setItem('projectID', projectDataResponse.project_id);
                 <Card.Body>
                   {error && <p className="text-danger">{error}</p>}
                   {successMessage && <p className="text-success">{successMessage}</p>}
-
+                  {errorMessage && (
+                    <div className="alert alert-danger mb-3">
+                      {errorMessage}
+                    </div>
+                  )}
                   <Form onSubmit={handleProjectSubmit}>
                     <Form.Group controlId="projectName">
                       <Form.Label>Project Name:</Form.Label>
@@ -517,10 +677,12 @@ sessionStorage.setItem('projectID', projectDataResponse.project_id);
                         type="text"
                         value={projectName}
                         onChange={(e) => setProjectName(e.target.value)}
-                        onBlur={() => handleBlur('projectName')}
-                        isInvalid={!!errors.projectName}
-                        required
+                        onBlur={(e) => handleBlur('projectName', e.target.value)}
+                        className={formErrors.projectName ? 'is-invalid' : ''}
                       />
+                      {formErrors.projectName && (
+                        <div className="invalid-feedback">{formErrors.projectName}</div>
+                      )}
                     </Form.Group>
                     <Form.Group controlId="confirmProjectName">
                       <Form.Label>Confirm Project Name:</Form.Label>
@@ -528,10 +690,12 @@ sessionStorage.setItem('projectID', projectDataResponse.project_id);
                         type="text"
                         value={confirmProjectName}
                         onChange={(e) => setConfirmProjectName(e.target.value)}
-                        onBlur={() => handleBlur('projectName')}
-                        isInvalid={!!errors.projectName}
-                        required
+                        onBlur={(e) => handleBlur('confirmProjectName', e.target.value)}
+                        className={formErrors.confirmProjectName ? 'is-invalid' : ''}
                       />
+                      {formErrors.confirmProjectName && (
+                        <div className="invalid-feedback">{formErrors.confirmProjectName}</div>
+                      )}
                     </Form.Group>
                     <br />
                     <Button
@@ -575,7 +739,7 @@ sessionStorage.setItem('projectID', projectDataResponse.project_id);
                             as="select"
                             value={selectedProject}
                             onChange={(e) => setSelectedProject(e.target.value)}
-                          // onChange={(e) => setProjectName(e.target.value)}
+                            className={error ? 'is-invalid' : ''}
                           >
                             <option value="">Select a project</option>
                             {pendingProjects.map((projectName, index) => (
@@ -584,24 +748,27 @@ sessionStorage.setItem('projectID', projectDataResponse.project_id);
                               </option>
                             ))}
                           </Form.Control>
+                          {error && (
+                            <div className="invalid-feedback">{error}</div>
+                          )}
                         </Form.Group>
 
                         <Form.Group>
-                          <Form.Label>Status:</Form.Label>
-                          <Form.Control
+                          <Form.Label>Status: Pending</Form.Label>
+                          {/* <Form.Control
                             as="select"
                             value="Pending"
                             readOnly
-                            style={{ borderColor: 'orange' }} // Apply warning color for Pending
+                            style={{ borderColor: '' }} // Apply warning color for Pending
                           >
-                            <option>Pending</option>
-                          </Form.Control>
+                            {/* <option>Pending</option> */}
+                          {/* </Form.Control> */} 
                         </Form.Group>
                         <br />
                         <Button
                           variant="primary"
                           onClick={() => handleProjectUpdate(selectedProject)} // Pass the selected project name
-                          disabled={isPending}
+                          disabled={!selectedProject || isPending}
                           style={{
                             fontWeight: 'bold',
                             color: '#ffffff',
@@ -611,6 +778,9 @@ sessionStorage.setItem('projectID', projectDataResponse.project_id);
                         >
                           {isPending ? 'Proceeding...' : 'Proceed with Update'}
                         </Button>
+                        {error && (
+                          <div className="text-danger mt-2">{error}</div>
+                        )}
                       </Form>
                     </Card.Body>
                   </Card>
@@ -631,8 +801,16 @@ sessionStorage.setItem('projectID', projectDataResponse.project_id);
             Add Project Details
           </Card.Header>
           <Card.Body>
+            {errorMessage && (
+              <div className="alert alert-danger mb-3">
+                {errorMessage}
+              </div>
+            )}
             <div style={{ maxHeight: '600px', overflowY: 'auto' }}> {/* Apply Scroll on Overflow */}
-              <Form onSubmit={handleProjectDetailsSubmit}>
+              <Form onSubmit={(e) => {
+                e.preventDefault();
+                handleSubmitClick(e);
+              }}>
                 <div className="row">
                   <div className="col-md-6">
                     {/* Project Name */}
@@ -647,99 +825,101 @@ sessionStorage.setItem('projectID', projectDataResponse.project_id);
 
                     {/* rag */}
                     <Form.Group controlId="rag">
-                            <Form.Label>rag</Form.Label>
-                            <Form.Control
-                              as="select"
-                              value={formData.rag}
-                              onChange={handleChange}
-                              onBlur={() => {}}
-                              isInvalid={!!formData.rag}
-                              required
-                              style={{
-                                padding: '10px',
-                                borderRadius: '4px',
-                                fontSize: '16px',
-                              }}
-                            >
-                              <option value="">Select rag</option>
-                              <option
-                                value="Green"
-                                style={{
-                                  backgroundColor: hoveredOption === 'Green' ? '#28a745' : '',
-                                  color: hoveredOption === 'Green' ? 'white' : '',
-                                }}
-                                onMouseEnter={() => handleHover('Green')}
-                                onMouseLeave={() => setHoveredOption('')}
-                              >
-                                Green
-                              </option>
-                              <option
-                                value="Amber"
-                                style={{
-                                  backgroundColor: hoveredOption === 'Amber' ? '#ffc107' : '',
-                                  color: hoveredOption === 'Amber' ? 'black' : '',
-                                }}
-                                onMouseEnter={() => handleHover('Amber')}
-                                onMouseLeave={() => setHoveredOption('')}
-                              >
-                                Amber
-                              </option>
-                              <option
-                                value="Red"
-                                style={{
-                                  backgroundColor: hoveredOption === 'Red' ? '#dc3545' : '',
-                                  color: hoveredOption === 'Red' ? 'white' : '',
-                                }}
-                                onMouseEnter={() => handleHover('Red')}
-                                onMouseLeave={() => setHoveredOption('')}
-                              >
-                                Red
-                              </option>
-                            </Form.Control>
-                          </Form.Group>
-
+                      <Form.Label>RAG Status</Form.Label>
+                      <Form.Control
+                        as="select"
+                        value={formData.rag}
+                        onChange={(e) => setFormData({ ...formData, rag: e.target.value })}
+                        onBlur={(e) => handleBlur('rag', e.target.value)}
+                        className={formErrors.rag ? 'is-invalid' : ''}
+                      >
+                        <option value="">Select RAG Status</option>
+                        <option
+                          value="Green"
+                          style={{
+                            backgroundColor: hoveredOption === 'Green' ? '#28a745' : '',
+                            color: hoveredOption === 'Green' ? 'white' : '',
+                          }}
+                          onMouseEnter={() => handleHover('Green')}
+                          onMouseLeave={() => setHoveredOption('')}
+                        >
+                          Green
+                        </option>
+                        <option
+                          value="Amber"
+                          style={{
+                            backgroundColor: hoveredOption === 'Amber' ? '#ffc107' : '',
+                            color: hoveredOption === 'Amber' ? 'black' : '',
+                          }}
+                          onMouseEnter={() => handleHover('Amber')}
+                          onMouseLeave={() => setHoveredOption('')}
+                        >
+                          Amber
+                        </option>
+                        <option
+                          value="Red"
+                          style={{
+                            backgroundColor: hoveredOption === 'Red' ? '#dc3545' : '',
+                            color: hoveredOption === 'Red' ? 'white' : '',
+                          }}
+                          onMouseEnter={() => handleHover('Red')}
+                          onMouseLeave={() => setHoveredOption('')}
+                        >
+                          Red
+                        </option>
+                      </Form.Control>
+                      {formErrors.rag && (
+                        <div className="invalid-feedback">{formErrors.rag}</div>
+                      )}
+                    </Form.Group>
 
                     {/* rag Details */}
                     <Form.Group controlId="rag_details">
-                      <Form.Label>rag Details</Form.Label>
+                      <Form.Label>RAG Details</Form.Label>
                       <Form.Control
                         type="text"
                         value={formData.rag_details}
                         onChange={(e) => setFormData({ ...formData, rag_details: e.target.value })}
-                        onBlur={() => handleBlur('projectName')}
-                        isInvalid={!!errors.projectName}
-                        required
+                        onBlur={(e) => handleBlur('rag_details', e.target.value)}
+                        className={formErrors.rag_details ? 'is-invalid' : ''}
                       />
+                      {formErrors.rag_details && (
+                        <div className="invalid-feedback">{formErrors.rag_details}</div>
+                      )}
                     </Form.Group>
 
                     <Form.Group controlId="tester_count">
-                                          <Form.Label style={{ fontWeight: '' }}>Tester Count</Form.Label>
-                                          <Form.Control
-                                            type="number"
-                                            value={formData.tester_count}
-                                            readOnly
-                                            style={{ borderRadius: '5px', padding: '10px', backgroundColor: '#f8f9fa' }}
-                                          />
-                                          {errors.tester_count && <div style={{ color: 'red' }}>{errors.tester_count}</div>}
-                                        </Form.Group>
+                      <Form.Label style={{ fontWeight: '' }}>Tester Count</Form.Label>
+                      <Form.Control
+                        type="number"
+                        value={formData.tester_count}
+                        readOnly
+                        style={{ borderRadius: '5px', padding: '10px', backgroundColor: '#f8f9fa' }}
+                      />
+                      {errors.tester_count && <div style={{ color: 'red' }}>{errors.tester_count}</div>}
+                    </Form.Group>
 
-                                        <Form.Group controlId="billing_type">
+                    <Form.Group controlId="billing_type">
                       <Form.Label>Billing Type</Form.Label>
                       <Form.Control
                         as="select"
                         value={formData.billing_type}
                         onChange={(e) => setFormData({ ...formData, billing_type: e.target.value })}
-                        onBlur={() => handleBlur('projectName')}
-                        isInvalid={!!errors.projectName}
+                        onBlur={(e) => handleBlur('billing_type', e.target.value)}
+                        className={formErrors.billing_type ? 'is-invalid' : ''}
                         required
                       >
                         <option value="">Select Billing Type</option>
                         <option value="T&M">T&M</option>
                         <option value="FIXED">FIXED</option>
                       </Form.Control>
+                      {formErrors.billing_type && (
+                        <div className="invalid-feedback">{formErrors.billing_type}</div>
+                      )}
                     </Form.Group>
 
                     {/* Billable Testers Dropdown */}
+                    
                     
                   </div>
 
@@ -749,17 +929,21 @@ sessionStorage.setItem('projectID', projectDataResponse.project_id);
                     <Form.Group controlId="billable">
                       <Form.Label>Billable Testers</Form.Label>
                       <Dropdown>
-                        <Dropdown.Toggle variant="success" id="dropdown-basic"
-                        style={{
-                          width: '100%',
-                          padding: '8px',
-                          textAlign: 'left',
-                          backgroundColor: '#000d6b',  // Apply the color to the dropdown button
-                          borderColor: '#000d6b',  // Matching border color
-                          color: '#ffffff',  // Ensure text is white for contrast
-                          borderRadius: '5px'
-                        }}>
-                          
+                        <Dropdown.Toggle 
+                          variant="success" 
+                          id="dropdown-basic"
+                          className={formErrors.billable ? 'is-invalid' : ''}
+                          style={{
+                            width: '100%',
+                            padding: '8px',
+                            textAlign: 'left',
+                            backgroundColor: '#000d6b',
+                            borderColor: formErrors.billable ? '#dc3545' : '#000d6b',
+                            color: '#ffffff',
+                            borderRadius: '5px'
+                          }}
+                          onBlur={() => handleBlur('billable', selectedTesters.billable)}
+                        >
                           {selectedTesters.billable.length > 0
                             ? selectedTesters.billable.map(t => t.tester_name).join(', ')
                             : 'Select Testers'}
@@ -785,12 +969,27 @@ sessionStorage.setItem('projectID', projectDataResponse.project_id);
                           </Dropdown.Item>
                         </Dropdown.Menu>
                       </Dropdown>
+                      {formErrors.billable && (
+                        <div className="text-danger mt-1 small">{formErrors.billable}</div>
+                      )}
                     </Form.Group>
+
                     <Form.Group controlId="nonbillable">
                       <Form.Label>Non-Billable Testers</Form.Label>
                       <Dropdown>
-                        <Dropdown.Toggle variant="secondary" id="dropdown-basic"
-                        style={{ width: '100%', padding: '10px', textAlign: 'left', backgroundColor: "000d6b" }}>
+                        <Dropdown.Toggle 
+                          variant="secondary" 
+                          id="dropdown-basic"
+                          className={formErrors.nonbillable ? 'is-invalid' : ''}
+                          style={{
+                            width: '100%',
+                            padding: '10px',
+                            textAlign: 'left',
+                            backgroundColor: '#000d6b', // Fixed string literal
+                            borderColor: formErrors.nonbillable ? '#dc3545' : '#000d6b'
+                          }}
+                          onBlur={() => handleBlur('nonbillable', selectedTesters.nonbillable)}
+                        >
                           {selectedTesters.nonbillable.length > 0
                             ? selectedTesters.nonbillable.map(t => t.tester_name).join(', ')
                             : 'Select Testers'}
@@ -816,6 +1015,9 @@ sessionStorage.setItem('projectID', projectDataResponse.project_id);
                           </Dropdown.Item>
                         </Dropdown.Menu>
                       </Dropdown>
+                      {formErrors.nonbillable && (
+                        <div className="text-danger mt-1 small">{formErrors.nonbillable}</div>
+                      )}
                     </Form.Group>
 
                     {/* Billing Type Dropdown */}
@@ -823,23 +1025,42 @@ sessionStorage.setItem('projectID', projectDataResponse.project_id);
 
                     {/* Automation Used Section */}
                     <Form.Group controlId="Automation">
-                      <Form.Label>Automation Used</Form.Label>
+                      <Form.Label>Automation Used *</Form.Label>
                       <div>
                         <Form.Check
                           type="radio"
                           label="Yes"
                           value="Yes"
+                          name="automation"
                           checked={formData.automation === 'Yes'}
-                          onChange={(e) => setFormData({ ...formData, automation: e.target.value })}
+                          onChange={(e) => {
+                            setFormData({ 
+                              ...formData, 
+                              automation: e.target.value,
+                              automation_details: '' // Reset details when switching to Yes
+                            });
+                          }}
+                          required
                         />
                         <Form.Check
                           type="radio"
                           label="No"
                           value="No"
+                          name="automation"
                           checked={formData.automation === 'No'}
-                          onChange={(e) => setFormData({ ...formData, automation: e.target.value })}
+                          onChange={(e) => {
+                            setFormData({ 
+                              ...formData, 
+                              automation: e.target.value,
+                              automation_details: "No Automation is used here" // Clear details when No is selected
+                            });
+                          }}
+                          required
                         />
                       </div>
+                      {formErrors.automation && (
+                        <div className="text-danger">{formErrors.automation}</div>
+                      )}
                       {formData.automation === 'Yes' && (
                         <div>
                           <Button
@@ -881,34 +1102,58 @@ sessionStorage.setItem('projectID', projectDataResponse.project_id);
                           // Set the session storage based on the selected value
                           sessionStorage.setItem('agileType', selectedValue === 'Agile' ? 'true' : 'false');
                         }}
+                        onBlur={(e) => handleBlur('agile_type', e.target.value)}
+                        className={formErrors.agile_type ? 'is-invalid' : ''}
                         required
                       >
                         <option value="">Select Project Type</option>
                         <option value="Agile">Agile</option>
                         <option value="Non-Agile">Non-Agile</option>
                       </Form.Control>
+                      {formErrors.agile_type && (
+                        <div className="invalid-feedback">{formErrors.agile_type}</div>
+                      )}
                     </Form.Group>
 
 
                     {/* AI Used Section */}
                     <Form.Group controlId="AI">
-                      <Form.Label>AI Used</Form.Label>
+                      <Form.Label>AI Used *</Form.Label>
                       <div>
                         <Form.Check
                           type="radio"
                           label="Yes"
                           value="Yes"
+                          name="ai_used"
                           checked={formData.ai_used === 'Yes'}
-                          onChange={(e) => setFormData({ ...formData, ai_used: e.target.value })}
+                          onChange={(e) => {
+                            setFormData({ 
+                              ...formData, 
+                              ai_used: e.target.value,
+                              ai_used_details: '' // Reset details when switching to Yes
+                            });
+                          }}
+                          required
                         />
                         <Form.Check
                           type="radio"
                           label="No"
                           value="No"
+                          name="ai_used"
                           checked={formData.ai_used === 'No'}
-                          onChange={(e) => setFormData({ ...formData, ai_used: e.target.value })}
+                          onChange={(e) => {
+                            setFormData({ 
+                              ...formData, 
+                              ai_used: e.target.value,
+                              ai_used_details: "No ai is used here" // Clear details when No is selected
+                            });
+                          }}
+                          required
                         />
                       </div>
+                      {formErrors.ai_used && (
+                        <div className="text-danger">{formErrors.ai_used}</div>
+                      )}
                       {formData.ai_used === 'Yes' && (
                         <div>
                           <Button
@@ -942,9 +1187,16 @@ sessionStorage.setItem('projectID', projectDataResponse.project_id);
                   </div>
                 </div>
                 {/* Submit Button */}
-                <Button variant="primary" type="submit"
-                  style={{ fontWeight: 'bold', color: '#ffffff', backgroundColor: '#000d6b', borderColor: '#000d6b', }}
-                  onClick={handleSubmitClick} >
+                <Button 
+                  variant="primary" 
+                  type="submit"
+                  style={{ 
+                    fontWeight: 'bold', 
+                    color: '#ffffff', 
+                    backgroundColor: '#000d6b', 
+                    borderColor: '#000d6b' 
+                  }}
+                >
                   Submit
                 </Button>
 
@@ -961,14 +1213,35 @@ sessionStorage.setItem('projectID', projectDataResponse.project_id);
         <div className="popup-overlay">
           <div className="popup">
             <h3>Confirm Project Details</h3>
-            <p>
-              Are you sure you want to proceed with the project "{selectedProject || projectName}"?
-            </p>
-
-            <Button onClick={handleProjectDetailsSubmit} style={{ marginRight: '10px' }} disabled={loading}>
-              {loading ? 'Submitting...' : 'Yes, Proceed'}
-            </Button>
-            <Button onClick={handlePopupCancel}>Cancel</Button>
+            <p>Are you sure you want to proceed with the project "{selectedProject || projectName}"?</p>
+            <div className="popup-buttons">
+              <Button 
+                onClick={handleProjectDetailsSubmit}
+                disabled={isPending}
+                style={{ marginRight: '10px' }}
+              >
+                {isPending ? (
+                  <>
+                    <Spinner size="sm" className="me-2" />
+                    Submitting...
+                  </>
+                ) : (
+                  'Yes, Proceed'
+                )}
+              </Button>
+              <Button 
+                onClick={handlePopupCancel}
+                disabled={isPending}
+                variant="secondary"
+              >
+                Cancel
+              </Button>
+            </div>
+            {errorMessage && (
+              <div className="alert alert-danger mt-3">
+                {errorMessage}
+              </div>
+            )}
           </div>
         </div>
       )}  
@@ -1010,7 +1283,5 @@ sessionStorage.setItem('projectID', projectDataResponse.project_id);
     </div>
   );
 };
-
-export default AddProjectWithDetails;
 
 

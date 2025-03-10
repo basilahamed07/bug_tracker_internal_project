@@ -34,7 +34,7 @@ const CreateSprint = () => {
     const fetchUserRole = async () => {
       try {
         const token = sessionStorage.getItem('access_token');
-        const response = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms/get-role', {
+        const response = await fetch('http://localhost:5000/get-role', {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -77,7 +77,7 @@ const CreateSprint = () => {
   const fetchSprintDetailsFromApi = async (agile_id) => {
     try {
       const accessToken = sessionStorage.getItem('access_token');
-      const response = await axios.get(`https://frt4cnbr-5000.inc1.devtunnels.ms/sprint_details/${agile_id}`, {
+      const response = await axios.get(`http://localhost:5000/sprint_details/${agile_id}`, {
         headers: {
           'Authorization': `Bearer ${accessToken}`,
         }
@@ -93,7 +93,7 @@ const CreateSprint = () => {
   const fetchTesters = async (projectId) => {
     try {
       const accessToken = sessionStorage.getItem('access_token');
-      const response = await axios.get(`https://frt4cnbr-5000.inc1.devtunnels.ms/tester_name_by_project/${projectId}`, {
+      const response = await axios.get(`http://localhost:5000/tester_name_by_project/${projectId}`, {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${accessToken}`,
@@ -191,7 +191,7 @@ const CreateSprint = () => {
       const accessToken = sessionStorage.getItem('access_token');
       if (editMode) {
         // PUT request to update sprint
-        const response = await axios.put('https://frt4cnbr-5000.inc1.devtunnels.ms/update_sprint_story_put', newSprintDetails, {
+        const response = await axios.put('http://localhost:5000/update_sprint_story_put', newSprintDetails, {
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${accessToken}`,
@@ -201,7 +201,7 @@ const CreateSprint = () => {
         setSprints(prevSprints => prevSprints.map(sprint => sprint.sprint_id === response.data.sprint_details.sprint_id ? response.data.sprint_details : sprint));
       } else {
         // POST request to create new sprint
-        const response = await axios.post('https://frt4cnbr-5000.inc1.devtunnels.ms/update_sprint_story', newSprintDetails, {
+        const response = await axios.post('http://localhost:5000/update_sprint_story', newSprintDetails, {
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${accessToken}`,
@@ -234,7 +234,7 @@ const CreateSprint = () => {
   
       // Make a DELETE request to the API to delete the sprint
       const accessToken = sessionStorage.getItem('access_token');
-      const response = await axios.delete(`https://frt4cnbr-5000.inc1.devtunnels.ms/sprint_details/${sprintId}`, {
+      const response = await axios.delete(`http://localhost:5000/sprint_details/${sprintId}`, {
         headers: {
           'Authorization': `Bearer ${accessToken}`,
         },

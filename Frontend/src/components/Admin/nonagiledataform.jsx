@@ -175,7 +175,7 @@ const Nonagileform = () => {
     };
 
     try {
-      const response = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms/testing-type', {
+      const response = await fetch('http://localhost:5000/testing-type', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

@@ -20,7 +20,7 @@ const Nonagileview = () => {
 
         // Fetch manual testing data
         const manualResponse = await fetch(
-          `https://frt4cnbr-5000.inc1.devtunnels.ms/testing-type/manual/latest/${projectId}`,
+          `http://localhost:5000/testing-type/manual/latest/${projectId}`,
           {
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -30,7 +30,7 @@ const Nonagileview = () => {
 
         // Fetch automation testing data
         const automationResponse = await fetch(
-          `https://frt4cnbr-5000.inc1.devtunnels.ms/testing-type/automation/latest/${projectId}`,
+          `http://localhost:5000/testing-type/automation/latest/${projectId}`,
           {
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -40,7 +40,7 @@ const Nonagileview = () => {
 
         // Fetch open defects data
         const defectsResponse = await fetch(
-          `https://frt4cnbr-5000.inc1.devtunnels.ms/open_defact/${projectId}`,
+          `http://localhost:5000/open_defact/${projectId}`,
           {
             headers: {
               'Authorization': `Bearer ${token}`,

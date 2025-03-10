@@ -1,4 +1,3 @@
-
 // MY CODE 
 
 import React, { useState, useEffect } from 'react';
@@ -7,15 +6,15 @@ import { Button, Table, Form, Card, Row, Col, Modal } from 'react-bootstrap';
 import axios from 'axios';
 
 import { useNavigate } from 'react-router-dom'; // Use useNavigate instead of useHistory
-
+ 
 
 const ManageDefectAcceptedRejected = () => {
   const [defectStatuses, setDefectStatuses] = useState([]);
   const [formData, setFormData] = useState({
     date: '',
-    total_defects: 0,
-    dev_team_accepted: 0,
-    dev_team_rejected: 0,
+    total_defects: '',
+    dev_team_accepted: '',
+    dev_team_rejected: '',
     project_name_id: ''
   });
   const [projects, setProjects] = useState([]);
@@ -36,54 +35,56 @@ const ManageDefectAcceptedRejected = () => {
 
 
   useEffect(() => {
-    fetchDefectStatuses();
-    fetchUserProjects(); // Fetch projects when the component mounts
-
+    const projectId = sessionStorage.getItem('project_name_id');
+    if (projectId) {
+      fetchDefectStatuses(projectId);
+    }
+    fetchUserProjects();
 
     // Check if there's data in localStorage for manageDefect
     const storedData = localStorage.getItem('ManageDefectAcceptedRejected');
     if (storedData) {
       const parsedData = JSON.parse(storedData);
-      setFormData(parsedData); // Fill the form with the stored data
+      setFormData(parsedData);
     }
 
-
     // Retrieve the selected project name from sessionStorage
-    const projectNameFromSession = sessionStorage.getItem('projectName');
-    if (projectNameFromSession) {
+    const projectNameFromSession = sessionStorage.getItem('selectedProject');
+
+    const projectIdFromSession = sessionStorage.getItem('project_id');
+    
+     if (projectNameFromSession) {
       setProjectName(projectNameFromSession); // Set the project name from session
       setFormData(prevState => ({
         ...prevState,
         project_name_id: projectNameFromSession, // Set project_name_id based on sessionStorage data
       }));
     }
+
     const selectedDate = sessionStorage.getItem('date');
     if(selectedDate){
       setFormData(prevState => ({
         ...prevState,
-        date: selectedDate, // Set project_name_id based on sessionStorage data
+        date: selectedDate,
       }));
     }
   }, []);
 
-  useEffect(() => {
-    if (formData.project_name_id) {
-      fetchDefectStatuses(formData.project_name_id); // Fetch defects for the selected project
+  const fetchDefectStatuses = async (projectId) => {
+    if (!projectId) {
+      console.error('Project ID is undefined');
+      return;
     }
-  }, [formData.project_name_id]);
-  console.log("formDataproject_name_id", formData.project_name_id)
-
-  const fetchDefectStatuses = async (project_name_id) => {
+    
     const token = sessionStorage.getItem('access_token');
     try {
-      const response = await axios.get(`https://frt4cnbr-5000.inc1.devtunnels.ms/defect_accepted_rejected/${project_name_id}`, {
+      const response = await axios.get(`http://localhost:5000/defect_accepted_rejected/${projectId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
       setDefectStatuses(response.data);
-      console.log("TGHJUYHGFFGYHJKHGFGHJ", response)
     } catch (error) {
       console.error('Error fetching defect accepted/rejected statuses:', error);
     }
@@ -92,7 +93,7 @@ const ManageDefectAcceptedRejected = () => {
   const fetchUserProjects = async () => {
     const token = sessionStorage.getItem('access_token');
     try {
-      const response = await axios.get('https://frt4cnbr-5000.inc1.devtunnels.ms/get-user-projects', {
+      const response = await axios.get('http://localhost:5000/get-user-projects', {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -113,7 +114,7 @@ const ManageDefectAcceptedRejected = () => {
   const fetchDefectsForProject = async (projectId) => {
     const token = sessionStorage.getItem('access_token');
     try {
-      const response = await axios.get(`https://frt4cnbr-5000.inc1.devtunnels.ms/defect_accepted_rejected/${projectId}`, {
+      const response = await axios.get(`http://localhost:5000/defect_accepted_rejected/${projectId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -129,11 +130,11 @@ const ManageDefectAcceptedRejected = () => {
 
   const validateForm = () => {
     const requiredFields = [
-      'date',
-      'total_defects',
+      // 'date',
+      // 'total_defects',
       'dev_team_accepted',
       'dev_team_rejected',
-      'project_name_id'
+      // 'project_name_id'
     ];
     const newErrors = {};
 
@@ -154,7 +155,7 @@ const ManageDefectAcceptedRejected = () => {
 
   const handleChange = e => {
     const { name, value } = e.target;
-    if(name == 'date'){
+    if(name === 'date'){
       sessionStorage.setItem('date', value);
     }
     const newFormData = {
@@ -163,7 +164,10 @@ const ManageDefectAcceptedRejected = () => {
     };
 
     if (name === 'dev_team_accepted' || name === 'dev_team_rejected') {
-      newFormData.total_defects = parseInt(newFormData.dev_team_accepted || 0) + parseInt(newFormData.dev_team_rejected || 0);
+      // Calculate total only if both values exist and are not empty
+      const accepted = parseInt(newFormData.dev_team_accepted) || 0;
+      const rejected = parseInt(newFormData.dev_team_rejected) || 0;
+      newFormData.total_defects = accepted + rejected || '';
     }
 
     setFormData(newFormData);
@@ -174,8 +178,8 @@ const ManageDefectAcceptedRejected = () => {
     const token = sessionStorage.getItem('access_token');
     const method = editingStatus ? 'PUT' : 'POST';
     const url = editingStatus
-      ? `https://frt4cnbr-5000.inc1.devtunnels.ms/defect_accepted_rejected/${editingStatus.id}`
-      : 'https://frt4cnbr-5000.inc1.devtunnels.ms/defect_accepted_rejected';
+      ? `http://localhost:5000/defect_accepted_rejected/${editingStatus.id}`
+      : 'http://localhost:5000/defect_accepted_rejected';
 
     try {
       const response = await axios({
@@ -192,9 +196,9 @@ const ManageDefectAcceptedRejected = () => {
         setEditingStatus(null);
         setFormData({
           date: '',
-          total_defects: 0,
-          dev_team_accepted: 0,
-          dev_team_rejected: 0,
+          total_defects: '',
+          dev_team_accepted: '',
+          dev_team_rejected: '',
           project_name_id: ''
         });
         fetchDefectStatuses();
@@ -210,7 +214,7 @@ const ManageDefectAcceptedRejected = () => {
     if (window.confirm('Are you sure you want to delete this status?')) {
       const token = sessionStorage.getItem('access_token');
       try {
-        const response = await axios.delete(`https://frt4cnbr-5000.inc1.devtunnels.ms/defect_accepted_rejected/${id}`, {
+        const response = await axios.delete(`http://localhost:5000/defect_accepted_rejected/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -270,9 +274,6 @@ const ManageDefectAcceptedRejected = () => {
     return `${year}-${month}-${day}`;
   };
 
-
-
-
   const handleNext = () => {
     // Check if all required fields are filled
     // const isValid = Object.values(formData).every(field => field !== '');
@@ -289,6 +290,61 @@ const ManageDefectAcceptedRejected = () => {
     navigate('/AdminPanel/ManageTestCaseCreationStatus');
   };
 
+
+  // This function will be triggered when the "Go to Previous" button is clicked
+  // const handlePrevious = () => {
+  //   // Fetch the form data from localStorage
+  //   const savedData = JSON.parse(localStorage.getItem('ManageBuildStatus'));
+
+  //   if (savedData) {
+  //     setFormData(savedData); // Restore the form data from localStorage
+  //   } else {
+  //     console.log('No data found in localStorage.');
+  //   }
+
+  //   // Navigate to the previous page (can be a specific path or use -1 for going back to the last visited page)
+  //   // navigate('AdminPanel/ManageDefects'); // This will go back to the previous page
+  //   navigate(-1); // This will go back to the previous page
+  // };
+
+  // const handleNext = async () => {
+  //   const isValid = validateForm();
+  //   if (!isValid) {
+  //     return;
+  //   }
+  
+  //   try {
+  //     // First, submit the form data
+  //     const token = sessionStorage.getItem('access_token');
+  //     const projectId = sessionStorage.getItem('project_name_id');
+      
+  //     const response = await axios({
+  //       method: 'POST',
+  //       url: 'http://localhost:5000/defect_accepted_rejected',
+  //       headers: {
+  //         Authorization: `Bearer ${token}`,
+  //         'Content-Type': 'application/json'
+  //       },
+  //       data: {
+  //         ...formData,
+  //         project_name_id: projectId
+  //       }
+  //     });
+  
+  //     if (response.status === 200 || response.status === 201) {
+  //       // Store the form data in localStorage
+  //       localStorage.setItem('ManageDefectAcceptedRejected', JSON.stringify(formData));
+        
+  //       // Navigate to the next component
+  //       navigate('/AdminPanel/ManageTestCaseCreationStatus', { replace: true });
+  //     } else {
+  //       alert('Failed to save data. Please try again.');
+  //     }
+  //   } catch (error) {
+  //     console.error('Error saving data:', error);
+  //     alert('An error occurred while saving data.');
+  //   }
+  // };
 
   // This function will be triggered when the "Go to Previous" button is clicked
   const handlePrevious = () => {
@@ -322,7 +378,7 @@ const ManageDefectAcceptedRejected = () => {
     const { name, value } = e.target;
     const error = validateField(name, value);
     setErrors(prevErrors => ({
-      ...prevErrors,
+      ...prevErrors, 
       [name]: error
     }));
   };
@@ -367,6 +423,7 @@ const ManageDefectAcceptedRejected = () => {
                     isInvalid={!!errors.date}
                     max={today}
                     disabled={editingStatus}
+                    placeholder="Select date"
                   />
                   <Form.Control.Feedback type="invalid">{errors.date}</Form.Control.Feedback>
                 </Form.Group>
@@ -377,8 +434,10 @@ const ManageDefectAcceptedRejected = () => {
                     type="number"
                     name="total_defects"
                     value={formData.total_defects}
+                    style={{ backgroundColor: '#e9ecef' }}
                     readOnly
                     isInvalid={!!errors.total_defects}
+                    placeholder="Auto-calculated from accepted and rejected defects"
                   />
                   <Form.Control.Feedback type="invalid">{errors.total_defects}</Form.Control.Feedback>
                 </Form.Group>
@@ -392,6 +451,8 @@ const ManageDefectAcceptedRejected = () => {
                     onChange={handleChange}
                     onBlur={handleBlur}
                     isInvalid={!!errors.dev_team_accepted}
+                    placeholder="Enter number of accepted defects"
+                    min="0"
                   />
                   <Form.Control.Feedback type="invalid">{errors.dev_team_accepted}</Form.Control.Feedback>
                 </Form.Group>
@@ -407,6 +468,8 @@ const ManageDefectAcceptedRejected = () => {
                     onChange={handleChange}
                     onBlur={handleBlur}
                     isInvalid={!!errors.dev_team_rejected}
+                    placeholder="Enter number of rejected defects"
+                    min="0"
                   />
                   <Form.Control.Feedback type="invalid">{errors.dev_team_rejected}</Form.Control.Feedback>
                 </Form.Group>
@@ -419,23 +482,13 @@ const ManageDefectAcceptedRejected = () => {
                     type="text"
                     value={sessionStorage.getItem('selectedProject') || projectName} // Retrieve from sessionStorage if available
                     readOnly // Make the input read-only
+                    placeholder="Project name will be displayed here"
                   />
                 </Form.Group>
 
               </Col>
             </Row>
             <br />
-            {/* <Button
-              variant="primary"
-              onClick={handleSubmit}
-              style={{ backgroundColor: '#000d6b', borderColor: '#000d6b' }}
-            >
-              {editingStatus ? 'Update Status' : 'Add Status'}
-            </Button> */}
-
-
-
-
             <Button
               variant="primary"
               onClick={handlePrevious}
@@ -455,11 +508,6 @@ const ManageDefectAcceptedRejected = () => {
             >
               {editingStatus ? 'Update Status' : 'Proceed Next'}
             </Button>
-
-
-
-
-
           </Form>
         </Card.Body>
       </Card>

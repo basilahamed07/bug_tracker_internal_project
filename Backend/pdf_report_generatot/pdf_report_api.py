@@ -366,7 +366,7 @@ def pdf_router(app):
 
 
         # Register a custom font (optional)
-        pdfmetrics.registerFont(TTFont('CustomFont', r'D:\SIX-DATA\internal_project_sajiv\Backend_flask\pdf_report_generatot\dont.ttf'))  # Use your actual font path
+        pdfmetrics.registerFont(TTFont('CustomFont',r'D:\bug_tracking_sajive_project\bug_tracker_internal_project\Backend\pdf_report_generatot\dont.ttf'))  # Use your actual font path
 
         # Get styles
         styles = getSampleStyleSheet()

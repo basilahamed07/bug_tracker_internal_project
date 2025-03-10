@@ -79,7 +79,7 @@ const ManageTestExecutionStatus = () => {
   const fetchTestStatuses = async () => {
     const token = sessionStorage.getItem('access_token');
     try {
-      const response = await axios.get('https://frt4cnbr-5000.inc1.devtunnels.ms/test_execution_status', {
+      const response = await axios.get('http://localhost:5000/test_execution_status', {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -94,7 +94,7 @@ const ManageTestExecutionStatus = () => {
   const fetchUserProjects = async () => {
     const token = sessionStorage.getItem('access_token');
     try {
-      const response = await axios.get('https://frt4cnbr-5000.inc1.devtunnels.ms/get-user-projects', {
+      const response = await axios.get('http://localhost:5000/get-user-projects', {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -112,7 +112,7 @@ const ManageTestExecutionStatus = () => {
   const fetchDefects = async (projectId) => {
     const token = sessionStorage.getItem('access_token');
     try {
-      const response = await axios.get(`https://frt4cnbr-5000.inc1.devtunnels.ms/test_execution_status/${projectId}`, {
+      const response = await axios.get(`http://localhost:5000/test_execution_status/${projectId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -127,32 +127,57 @@ const ManageTestExecutionStatus = () => {
   };
 
   const validateForm = () => {
+    const newErrors = {};
     const requiredFields = [
       'date',
-      'total_execution',
       'tc_execution',
       'pass_count',
       'fail_count',
       'no_run',
-      'blocked',
-      'project_name_id'
+      'blocked'
     ];
-    const newErrors = {};
 
+    // Check required fields
     requiredFields.forEach(field => {
-      if (!formData[field]) {
-        newErrors[field] = `${field} is required.`;
+      if (!formData[field] && formData[field] !== 0) {
+        newErrors[field] = `${field.replace(/_/g, ' ')} is required`;
       }
     });
 
-    const sum = Number(formData.pass_count) + Number(formData.no_run) + Number(formData.fail_count) + Number(formData.blocked);
-    if (sum !== Number(formData.total_execution)) {
-      newErrors.total_execution = 'Total Execution must equal the sum of Pass Count, No Run, Fail Count, and Blocked.';
+    // Validate numeric fields are non-negative
+    const numericFields = ['tc_execution', 'pass_count', 'fail_count', 'no_run', 'blocked'];
+    numericFields.forEach(field => {
+      if (formData[field] && (isNaN(formData[field]) || Number(formData[field]) < 0)) {
+        newErrors[field] = `${field.replace(/_/g, ' ')} must be a non-negative number`;
+      }
+    });
+
+    // Validate total execution
+    const sum = Number(formData.pass_count || 0) + 
+                Number(formData.fail_count || 0) + 
+                Number(formData.no_run || 0) + 
+                Number(formData.blocked || 0);
+
+    formData.total_execution = sum.toString();
+
+    // Validate date
+    if (!formData.date) {
+      newErrors.date = 'Date is required';
+    } else {
+      const selectedDate = new Date(formData.date);
+      const today = new Date();
+      if (selectedDate > today) {
+        newErrors.date = 'Date cannot be in the future';
+      }
     }
+
+    // Set project_name_id from sessionStorage
+    formData.project_name_id = sessionStorage.getItem('projectID');
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+
   const handleChange = e => {
     const { name, value } = e.target;
     const updatedFormData = { ...formData, [name]: value };
@@ -199,8 +224,8 @@ const ManageTestExecutionStatus = () => {
     const token = sessionStorage.getItem('access_token');
     const method = editingStatus ? 'PUT' : 'POST';
     const url = editingStatus
-      ? `https://frt4cnbr-5000.inc1.devtunnels.ms/test_execution_status/${editingStatus.id}`
-      : 'https://frt4cnbr-5000.inc1.devtunnels.ms/test_execution_status';
+      ? `http://localhost:5000/test_execution_status/${editingStatus.id}`
+      : 'http://localhost:5000/test_execution_status';
 
     try {
       const response = await axios({
@@ -238,7 +263,7 @@ const ManageTestExecutionStatus = () => {
     if (window.confirm('Are you sure you want to delete this status?')) {
       const token = sessionStorage.getItem('access_token');
       try {
-        const response = await axios.delete(`https://frt4cnbr-5000.inc1.devtunnels.ms/test_execution_status/${id}`, {
+        const response = await axios.delete(`http://localhost:5000/test_execution_status/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -314,19 +339,33 @@ const ManageTestExecutionStatus = () => {
 
 
   const handleNext = () => {
-    // Check if all required fields are filled
-    // const isValid = Object.values(formData).every(field => field !== '');
-    const isValid = validateForm()
-    if (!isValid) {
-      alert('Please fill all the fields before proceeding.');
+    if (!validateForm()) {
+      const missingFields = Object.keys(errors)
+        .filter(key => errors[key])
+        .map(key => key.replace(/_/g, ' '))
+        .join(', ');
+      alert(`Please fill in the following required fields: ${missingFields}`);
       return;
     }
 
-    // Store the form data in localStorage
-    localStorage.setItem('ManageTestExecutionStatus', JSON.stringify(formData));
+    try {
+      // Store the form data in localStorage
+      const dataToStore = {
+        ...formData,
+        project_name_id: sessionStorage.getItem('selectedProject')
+      };
+      localStorage.setItem('ManageTestExecutionStatus', JSON.stringify(dataToStore));
 
-    // Navigate to the next component
-    navigate('/AdminPanel/ManageTotalDefectStatus');
+      // Store specific values in sessionStorage if needed
+      sessionStorage.setItem('testExecutionDate', formData.date);
+      sessionStorage.setItem('testExecutionTotalCount', formData.total_execution);
+
+      // Navigate to the next page
+      navigate('/AdminPanel/ManageTotalDefectStatus');
+    } catch (error) {
+      console.error('Error in handleNext:', error);
+      alert('There was an error processing the form. Please try again.');
+    }
   };
 
 
@@ -483,8 +522,13 @@ const ManageTestExecutionStatus = () => {
                   {/* Auto-select project name from sessionStorage and disable it */}
                   <Form.Control
                     type="text"
-                    value={sessionStorage.getItem('selectedProject') || projectName} // Retrieve from sessionStorage if available
-                    readOnly // Make the input read-only
+                    value={projectName || sessionStorage.getItem('selectedProject')} 
+                    readOnly
+                  />
+                  <Form.Control
+                    type="hidden"
+                    name="project_name_id"
+                    value={sessionStorage.getItem('projectID') || ''}
                   />
                 </Form.Group>
 

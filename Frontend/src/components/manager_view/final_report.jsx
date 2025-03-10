@@ -5,7 +5,7 @@ const GenerateReport = () => {
   const handleGenerateReport = async () => {
     try {
       // Make an API call to generate the PDF report
-      const response = await axios.get("https://frt4cnbr-5000.inc1.devtunnels.ms/pdf_report", {
+      const response = await axios.get("http://localhost:5000/pdf_report", {
         responseType: "blob",  // Ensure the response is a PDF
       });
 
