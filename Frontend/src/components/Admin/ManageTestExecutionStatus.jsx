@@ -80,7 +80,7 @@ const ManageTestExecutionStatus = () => {
   const fetchTestStatuses = async () => {
     const token = sessionStorage.getItem('access_token');
     try {
-      const response = await axios.get('https://frt4cnbr-5000.inc1.devtunnels.ms/test_execution_status', {
+      const response = await axios.get('http://localhost:5000/test_execution_status', {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -95,7 +95,7 @@ const ManageTestExecutionStatus = () => {
   const fetchUserProjects = async () => {
     const token = sessionStorage.getItem('access_token');
     try {
-      const response = await axios.get('https://frt4cnbr-5000.inc1.devtunnels.ms/get-user-projects', {
+      const response = await axios.get('http://localhost:5000/get-user-projects', {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -113,7 +113,7 @@ const ManageTestExecutionStatus = () => {
   const fetchDefects = async (projectId) => {
     const token = sessionStorage.getItem('access_token');
     try {
-      const response = await axios.get(`https://frt4cnbr-5000.inc1.devtunnels.ms/test_execution_status/${projectId}`, {
+      const response = await axios.get(`http://localhost:5000/test_execution_status/${projectId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -207,8 +207,8 @@ const ManageTestExecutionStatus = () => {
     const token = sessionStorage.getItem('access_token');
     const method = editingStatus ? 'PUT' : 'POST';
     const url = editingStatus
-      ? `https://frt4cnbr-5000.inc1.devtunnels.ms/test_execution_status/${editingStatus.id}`
-      : 'https://frt4cnbr-5000.inc1.devtunnels.ms/test_execution_status';
+      ? `http://localhost:5000/test_execution_status/${editingStatus.id}`
+      : 'http://localhost:5000/test_execution_status';
 
     try {
       const response = await axios({
@@ -246,7 +246,7 @@ const ManageTestExecutionStatus = () => {
     if (window.confirm('Are you sure you want to delete this status?')) {
       const token = sessionStorage.getItem('access_token');
       try {
-        const response = await axios.delete(`https://frt4cnbr-5000.inc1.devtunnels.ms/test_execution_status/${id}`, {
+        const response = await axios.delete(`http://localhost:5000/test_execution_status/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }

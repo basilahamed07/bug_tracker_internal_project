@@ -25,7 +25,7 @@ const SprintDetailsTable = () => {
     const fetchUserRole = async () => {
       try {
         const token = sessionStorage.getItem('access_token');
-        const response = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms/get-role', {
+        const response = await fetch('http://localhost:5000/get-role', {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -60,7 +60,7 @@ const SprintDetailsTable = () => {
   const findCurrentPI = async (pis, scrumId, token) => {
     for (const pi of pis) {
       const sprintsResponse = await fetch(
-        `https://frt4cnbr-5000.inc1.devtunnels.ms/sprint_details/${scrumId}/${pi}`,
+        `http://localhost:5000/sprint_details/${scrumId}/${pi}`,
         {
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -92,7 +92,7 @@ const SprintDetailsTable = () => {
 
         // Fetch PIs first
         const piResponse = await fetch(
-          `https://frt4cnbr-5000.inc1.devtunnels.ms/get_pl_name/${scrumId}`,
+          `http://localhost:5000/get_pl_name/${scrumId}`,
           {
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -121,7 +121,7 @@ const SprintDetailsTable = () => {
             
             // Fetch sprints for latest PI
             const sprintsResponse = await fetch(
-              `https://frt4cnbr-5000.inc1.devtunnels.ms/sprint_details/${scrumId}/${latestPI}`,
+              `http://localhost:5000/sprint_details/${scrumId}/${latestPI}`,
               {
                 headers: {
                   'Authorization': `Bearer ${token}`,
@@ -157,7 +157,7 @@ const SprintDetailsTable = () => {
   const handleDeleteClick = async (storyId) => {
     const token = sessionStorage.getItem('access_token');
     try {
-      const response = await fetch(`https://frt4cnbr-5000.inc1.devtunnels.ms/story_details/${storyId}`, {
+      const response = await fetch(`http://localhost:5000/story_details/${storyId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -178,7 +178,7 @@ const SprintDetailsTable = () => {
     try {
       const token = sessionStorage.getItem('access_token');
       const response = await fetch(
-        `https://frt4cnbr-5000.inc1.devtunnels.ms/sprint_details/${sprintId}`,
+        `http://localhost:5000/sprint_details/${sprintId}`,
         {
           method: 'DELETE',
           headers: {
@@ -235,7 +235,7 @@ const SprintDetailsTable = () => {
     };
 
     try {
-      const response = await fetch(`https://frt4cnbr-5000.inc1.devtunnels.ms/update_sprint_story_put`, {
+      const response = await fetch(`http://localhost:5000/update_sprint_story_put`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -277,7 +277,7 @@ const SprintDetailsTable = () => {
       setLoading(true);
 
       const response = await fetch(
-        `https://frt4cnbr-5000.inc1.devtunnels.ms/sprint_details/${scrumId}/${newPI}`,
+        `http://localhost:5000/sprint_details/${scrumId}/${newPI}`,
         {
           headers: {
             'Authorization': `Bearer ${token}`,

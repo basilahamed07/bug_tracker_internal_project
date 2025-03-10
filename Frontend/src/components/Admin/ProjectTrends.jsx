@@ -105,7 +105,7 @@ const ProjectTrends = () => {
   // Function to send the file to the backend
   const sendFileToBackend = async (formData) => {
     try {
-      const response = await axios.post('https://frt4cnbr-5000.inc1.devtunnels.ms/upload_data', formData, {
+      const response = await axios.post('http://localhost:5000/upload_data', formData, {
         headers: {
           'Content-Type': 'multipart/form-data', // Make sure to set the content type
           Authorization: `Bearer ${sessionStorage.getItem('access_token')}`,

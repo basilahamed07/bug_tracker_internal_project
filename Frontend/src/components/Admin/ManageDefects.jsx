@@ -79,7 +79,7 @@ const ManageDefects = () => {
   const fetchDefects = async (project_name_id) => {
     const token = sessionStorage.getItem('access_token');
     try {
-      const response = await axios.get(`https://frt4cnbr-5000.inc1.devtunnels.ms/new_defects/${project_name_id}`, {
+      const response = await axios.get(`http://localhost:5000/new_defects/${project_name_id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -95,7 +95,7 @@ const ManageDefects = () => {
   const fetchUserProjects = async () => {
     const token = sessionStorage.getItem('access_token');
     try {
-      const response = await axios.get('https://frt4cnbr-5000.inc1.devtunnels.ms/get-user-projects', {
+      const response = await axios.get('http://localhost:5000/get-user-projects', {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -135,8 +135,8 @@ const ManageDefects = () => {
     const token = sessionStorage.getItem('access_token');
     const method = editingDefect ? 'PUT' : 'POST';
     const url = editingDefect
-      ? `https://frt4cnbr-5000.inc1.devtunnels.ms/new_defects/${editingDefect.id}`
-      : 'https://frt4cnbr-5000.inc1.devtunnels.ms/new_defects';
+      ? `http://localhost:5000/new_defects/${editingDefect.id}`
+      : 'http://localhost:5000/new_defects';
 
     try {
       const response = await axios({
@@ -172,7 +172,7 @@ const ManageDefects = () => {
     if (window.confirm('Are you sure you want to delete this defect?')) {
       const token = sessionStorage.getItem('access_token');
       try {
-        const response = await axios.delete(`https://frt4cnbr-5000.inc1.devtunnels.ms/new_defects/${id}`, {
+        const response = await axios.delete(`http://localhost:5000/new_defects/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -201,7 +201,7 @@ const ManageDefects = () => {
   const handleViewDefects = async (projectId) => {
     try {
       const token = sessionStorage.getItem('access_token');
-      const response = await axios.get(`https://frt4cnbr-5000.inc1.devtunnels.ms/new_defects/${projectId}`, {
+      const response = await axios.get(`http://localhost:5000/new_defects/${projectId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',

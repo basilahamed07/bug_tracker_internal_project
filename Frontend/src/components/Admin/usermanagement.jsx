@@ -27,7 +27,7 @@
 //   const fetchUsers = async () => {
 //     const token = sessionStorage.getItem('access_token');
 //     try {
-//       const response = await axios.get('https://frt4cnbr-5000.inc1.devtunnels.ms/all-users', {
+//       const response = await axios.get('http://localhost:5000/all-users', {
 //         headers: {
 //           'Authorization': `Bearer ${token}`,
 //         },
@@ -66,7 +66,7 @@
 //     const token = sessionStorage.getItem('access_token');
 //     try {
 //       const response = await axios.post(
-//         'https://frt4cnbr-5000.inc1.devtunnels.ms/register',
+//         'http://localhost:5000/register',
 //         { username, password, role },
 //         {
 //           headers: {
@@ -132,7 +132,7 @@
 //       let response;
 //       if (editOption === 'password') {
 //         response = await axios.post(
-//           'https://frt4cnbr-5000.inc1.devtunnels.ms/password-update',
+//           'http://localhost:5000/password-update',
 //           { userId: editUserId, password },
 //           {
 //             headers: {
@@ -143,7 +143,7 @@
 //         );
 //       } else if (editOption === 'role') {
 //         response = await axios.post(
-//           'https://frt4cnbr-5000.inc1.devtunnels.ms/role-change',
+//           'http://localhost:5000/role-change',
 //           { userId: editUserId, role },
 //           {
 //             headers: {
@@ -410,7 +410,7 @@ const UserManagement = () => {
   const fetchUsers = async () => {
     const token = sessionStorage.getItem('access_token');
     try {
-      const response = await axios.get('https://frt4cnbr-5000.inc1.devtunnels.ms/all-users', {
+      const response = await axios.get('http://localhost:5000/all-users', {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -448,7 +448,7 @@ const UserManagement = () => {
     const token = sessionStorage.getItem('access_token');
     try {
       const response = await axios.post(
-        'https://frt4cnbr-5000.inc1.devtunnels.ms/register',
+        'http://localhost:5000/register',
         { username, password, role },
         {
           headers: {
@@ -480,10 +480,10 @@ const UserManagement = () => {
     }
   };
 
-  const handleCloseSuccessModal = () => {
-    setShowSuccessModal(false);
-    window.location.reload();
-  };
+  // const handleCloseSuccessModal = () => {
+  //   setShowSuccessModal(false);
+  //   window.location.reload();
+  // };
 
   const handleEditUser = (userId, currentUsername, currentRole) => {
     setEditUserId(userId);
@@ -515,7 +515,7 @@ const UserManagement = () => {
       let response;
       if (editOption === 'password') {
         response = await axios.post(
-          'https://frt4cnbr-5000.inc1.devtunnels.ms/password-update',
+          'http://localhost:5000/password-update',
           { userId: editUserId, password },
           {
             headers: {
@@ -526,7 +526,7 @@ const UserManagement = () => {
         );
       } else if (editOption === 'role') {
         response = await axios.post(
-          'https://frt4cnbr-5000.inc1.devtunnels.ms/role-change',
+          'http://localhost:5000/role-change',
           { userId: editUserId, role },
           {
             headers: {
@@ -755,7 +755,7 @@ const UserManagement = () => {
 
 
       {/* Success Modal */}
-      <Modal show={showSuccessModal} onHide={handleCloseSuccessModal} centered>
+      {/* <Modal show={showSuccessModal} onHide={handleCloseSuccessModal} centered>
         <Modal.Header closeButton>
           <Modal.Title>User Registered Successfully</Modal.Title>
         </Modal.Header>
@@ -765,7 +765,7 @@ const UserManagement = () => {
             Close
           </Button>
         </Modal.Body>
-      </Modal>
+      </Modal> */}
     </div>
   );
 };

@@ -16,7 +16,7 @@ const ProjectTable = () => {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const response = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms/project-details', {
+        const response = await fetch('http://localhost:5000/project-details', {
           headers: {
             'Authorization': `Bearer ${sessionStorage.getItem('access_token')}`
           }

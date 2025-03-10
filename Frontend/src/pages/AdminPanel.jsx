@@ -140,7 +140,7 @@ const Sidebar = () => {
         }
 
         // Fetch the role using the API
-        const response = await axios.get('https://frt4cnbr-5000.inc1.devtunnels.ms/get-role', {
+        const response = await axios.get('http://localhost:5000/get-role', {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -215,10 +215,6 @@ const Sidebar = () => {
               <Item activeClassName="active" to="/TestLead/project-trends">
                 <img src={expandall} alt="Manage input" />
                 <Text clicked={click} hovered={hovered}>Manage input</Text>
-              </Item>
-              <Item activeClassName="active" to="/TestLead/MatrixInput">
-                <img src={Projects} alt="Add Project" />
-                <Text clicked={click} hovered={hovered}>Matrix Input</Text>
               </Item>
             </>
           )}
