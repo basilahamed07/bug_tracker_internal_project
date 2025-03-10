@@ -216,10 +216,6 @@ const Sidebar = () => {
                 <img src={expandall} alt="Manage input" />
                 <Text clicked={click} hovered={hovered}>Manage input</Text>
               </Item>
-              <Item activeClassName="active" to="/TestLead/MatrixInput">
-                <img src={Projects} alt="Add Project" />
-                <Text clicked={click} hovered={hovered}>Matrix Input</Text>
-              </Item>
             </>
           )}
 

@@ -480,10 +480,10 @@ const UserManagement = () => {
     }
   };
 
-  const handleCloseSuccessModal = () => {
-    setShowSuccessModal(false);
-    window.location.reload();
-  };
+  // const handleCloseSuccessModal = () => {
+  //   setShowSuccessModal(false);
+  //   window.location.reload();
+  // };
 
   const handleEditUser = (userId, currentUsername, currentRole) => {
     setEditUserId(userId);
@@ -755,7 +755,7 @@ const UserManagement = () => {
 
 
       {/* Success Modal */}
-      <Modal show={showSuccessModal} onHide={handleCloseSuccessModal} centered>
+      {/* <Modal show={showSuccessModal} onHide={handleCloseSuccessModal} centered>
         <Modal.Header closeButton>
           <Modal.Title>User Registered Successfully</Modal.Title>
         </Modal.Header>
@@ -765,7 +765,7 @@ const UserManagement = () => {
             Close
           </Button>
         </Modal.Body>
-      </Modal>
+      </Modal> */}
     </div>
   );
 };

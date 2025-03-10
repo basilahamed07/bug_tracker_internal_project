@@ -96,7 +96,7 @@ const Routers = () => {
           <Route path="ManageTotalDefectStatus" element={<ManageTotalDefectStatus />} />
           <Route path="ManageBuildStatus" element={<ManageBuildStatus />} />
           <Route path="ManageDefectAcceptedRejected" element={<ManageDefectAcceptedRejected />} />
-          <Route path="MatrixInput" element={<MatrixInput />} />
+          {/* <Route path="MatrixInput" element={<MatrixInput />} /> */}
           <Route path="ScrumTeamManagement" element={<ScrumTeamManagement />} />
           {/* <Route path="Nonagile" element={<Nonagile />} /> */}
           <Route path="Nonagileview" element={<Nonagileview />} />
