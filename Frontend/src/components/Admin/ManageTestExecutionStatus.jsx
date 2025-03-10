@@ -7,6 +7,7 @@ import { Button, Table, Form, Card, Row, Col, Modal } from 'react-bootstrap';
 import axios from 'axios';
 
 import { useNavigate } from 'react-router-dom'; // Use useNavigate instead of useHistory
+import { getUserRoleFromToken } from '../../utils/tokenUtils'; // Import getUserRoleFromToken
 
 
 
@@ -201,24 +202,6 @@ const ManageTestExecutionStatus = () => {
     setFormData(updatedFormData);
   };
   
-  // const handleChange = e => {
-  //   const { name, value } = e.target;
-  //   const updatedFormData = { ...formData, [name]: value };
-  //   if (['pass_count', 'fail_count', 'no_run', 'blocked'].includes(name)) {
-  //     const sum = (
-  //       Number(updatedFormData.pass_count) +
-  //       Number(updatedFormData.fail_count) +
-  //       Number(updatedFormData.no_run) +
-  //       Number(updatedFormData.blocked)
-  //     ).toString();
-
-  //     // updatedFormData.tc_execution = sum;
-  //     updatedFormData.total_execution = sum;
-  //   }
-
-  //   setFormData(updatedFormData);
-  // };
-
   const handleSubmit = async () => {
     if (!validateForm()) return;
     const token = sessionStorage.getItem('access_token');
@@ -356,12 +339,19 @@ const ManageTestExecutionStatus = () => {
       };
       localStorage.setItem('ManageTestExecutionStatus', JSON.stringify(dataToStore));
 
-      // Store specific values in sessionStorage if needed
-      sessionStorage.setItem('testExecutionDate', formData.date);
-      sessionStorage.setItem('testExecutionTotalCount', formData.total_execution);
+      // Store specific values in sessionStorage
+      // sessionStorage.setItem('testExecutionDate', formData.date);
+      // sessionStorage.setItem('testExecutionTotalCount', formData.total_execution);
 
-      // Navigate to the next page
-      navigate('/AdminPanel/ManageTotalDefectStatus');
+      // Get user role and navigate accordingly
+      const currentRole = getUserRoleFromToken();
+      console.log('Current user role:', currentRole); // Debug log
+
+      if (currentRole === 'admin') {
+        navigate('/AdminPanel/ManageTotalDefectStatus');
+      } else {
+        navigate('/TestLead/ManageTotalDefectStatus');
+      }
     } catch (error) {
       console.error('Error in handleNext:', error);
       alert('There was an error processing the form. Please try again.');

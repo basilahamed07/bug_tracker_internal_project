@@ -30,6 +30,8 @@ const ManagerView = () => {
 
       const data = await response.json();
       setProjects(data.project_details);
+      // sessionStorage.setItem("data.project_name : ", data.project_details[0].project_name);
+      console.log("data.project_name : ", data);
       setProjectName(data.project_name);
       console.log("Fetched Data: ", data);
     } catch (error) {

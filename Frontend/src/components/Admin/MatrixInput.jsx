@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 const MetricsForm = () => {
   const [formData, setFormData] = useState({
     defectleakage: { cpDefect: '', uatDefect: '' },
-    defectdensity: { cpDefects: '', totalLinesOfCode: '' },
+    defectdensity: { cpDefects: '', totalLinesOfCode: '' }, 
     defectremovalefficiency: { cpDefects: '', uatDefects: '' },
     automationcoverage: { totalAutomationTcExecuted: '', totalTestCases: '' },
     testcasesefficiency: { defectsDetectedByTestCase: '', totalDefects: '' },

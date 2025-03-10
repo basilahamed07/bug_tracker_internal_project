@@ -3,6 +3,7 @@ import { FaEdit, FaTrashAlt } from 'react-icons/fa';
 import { Button, Table, Form, Card, Row, Col, Modal } from 'react-bootstrap';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom'; // Use useNavigate instead of useHistory
+import { getUserRoleFromToken } from '../../utils/tokenUtils';
 
 const ManageBuildStatus = () => {
   const [buildStatuses, setBuildStatuses] = useState([]);
@@ -260,9 +261,7 @@ const ManageBuildStatus = () => {
   const today = new Date().toISOString().split('T')[0]; // Current date in yyyy-mm-dd format
 
   const handleNext = () => {
-    // Check if all required fields are filled
-    // const isValid = Object.values(formData).every(field => field !== '');
-    const isValid = validateForm()
+    const isValid = validateForm();
     if (!isValid) {
       alert('Please fill all the fields before proceeding.');
       return;
@@ -271,8 +270,15 @@ const ManageBuildStatus = () => {
     // Store the form data in localStorage
     localStorage.setItem('ManageBuildStatus', JSON.stringify(formData));
 
-    // Navigate to the next component
-    navigate('/AdminPanel/ManageDefectAcceptedRejected');
+    // Get user role and navigate accordingly
+    const currentRole = getUserRoleFromToken();
+    console.log('Current user role:', currentRole); // Debug log
+
+    if (currentRole === 'admin') {
+      navigate('/AdminPanel/ManageDefectAcceptedRejected');
+    } else {
+      navigate('/TestLead/ManageDefectAcceptedRejected');
+    }
   };
 
   // This function will be triggered when the "Go to Previous" button is clicked
@@ -286,9 +292,15 @@ const ManageBuildStatus = () => {
       console.log('No data found in localStorage.');
     }
 
-    // Navigate to the previous page (can be a specific path or use -1 for going back to the last visited page)
-    // navigate('AdminPanel/ManageDefects'); // This will go back to the previous page
-    navigate(-1); // This will go back to the previous page
+    // Get user role and navigate accordingly
+    const currentRole = getUserRoleFromToken();
+    console.log('Current user role for previous:', currentRole); // Debug log
+
+    if (currentRole === 'admin') {
+      navigate('/AdminPanel/ManageTotalDefectStatus');
+    } else {
+      navigate('/TestLead/ManageTotalDefectStatus');
+    }
   };
 
   // validation 

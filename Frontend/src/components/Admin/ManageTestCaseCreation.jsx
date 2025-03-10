@@ -3,6 +3,8 @@ import { Button, Table, Form, Card, Row, Col, Modal } from 'react-bootstrap';
 import axios from 'axios';
 
 import { useNavigate } from 'react-router-dom'; // Use useNavigate instead of useHistory
+import { getUserRoleFromToken } from '../../utils/tokenUtils';
+import { jwtDecode } from 'jwt-decode'; // Add this import
 
 
 const ManageTestCaseCreationStatus = () => {
@@ -40,6 +42,17 @@ const ManageTestCaseCreationStatus = () => {
 
 
   useEffect(() => {
+    const token = sessionStorage.getItem('access_token');
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        const role = decoded.sub === '1' || decoded.type === 'access' ? 'admin' : 'testlead';
+        console.log('Initial role:', role);
+        setUserRole(role);
+      } catch (error) {
+        console.error("Error decoding token:", error);
+      }
+    }
     fetchTestCaseStatuses();
     fetchUserProjects();  // Fetch projects when the component mounts
 
@@ -307,9 +320,14 @@ const ManageTestCaseCreationStatus = () => {
         });
 
         // Navigate after successful submission
-        setTimeout(() => {
+        const currentRole = getUserRoleFromToken();
+        console.log('Current role for navigation:', currentRole);
+
+        if (currentRole === 'admin') {
+          navigate('/AdminPanel/MatrixInput');
+        } else {
           navigate('/TestLead/MatrixInput');
-        }, 2000);
+        }
       } else {
         throw new Error('Some requests failed');
       }
@@ -447,7 +465,14 @@ const ManageTestCaseCreationStatus = () => {
 
     // Navigate to the previous page (can be a specific path or use -1 for going back to the last visited page)
     // navigate('AdminPanel/ManageDefects'); // This will go back to the previous page
-    navigate(-1); // This will go back to the previous page
+    const currentRole = getUserRoleFromToken();
+    console.log('Current role for previous:', currentRole);
+
+    if (currentRole === 'admin') {
+      navigate('/AdminPanel/ManageDefectAcceptedRejected');
+    } else {
+      navigate('/TestLead/ManageDefectAcceptedRejected');
+    }
   };
 
 

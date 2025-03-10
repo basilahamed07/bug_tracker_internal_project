@@ -3,13 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { FaEdit, FaTrashAlt } from 'react-icons/fa';
 import { Button, Table, Form, Card, Row, Col, Modal } from 'react-bootstrap';
 import axios from 'axios';
-import { jwtDecode } from 'jwt-decode';
-
- 
-
+import { getUserRoleFromToken } from '../../utils/tokenUtils';
 import { useNavigate } from 'react-router-dom'; // Use useNavigate instead of useHistory
-
-
 const ManageTotalDefectStatus = () => {
   const [defectStatuses, setDefectStatuses] = useState([]);
   const [formData, setFormData] = useState({
@@ -317,36 +312,41 @@ const ManageTotalDefectStatus = () => {
 
 
   const handleNext = () => {
-    // Check if all required fields are filled
-    // const isValid = Object.values(formData).every(field => field !== '');
     const isValid = validateForm()
     if (!isValid) {
-      // alert('Please fill all the fields before proceeding.');
       return;
     }
  
     // Store the form data in localStorage
     localStorage.setItem('ManageTotalDefectStatuses', JSON.stringify(formData));
 
-    // Navigate to the next component
-    navigate('/AdminPanel/ManageBuildStatus');
-  };
+    // Get user role and navigate accordingly
+    const currentRole = getUserRoleFromToken();
+    console.log('Current user role for next:', currentRole); // Debug log
 
+    if (currentRole === 'admin') {
+      navigate('/AdminPanel/ManageBuildStatus');
+    } else {
+      navigate('/TestLead/ManageBuildStatus');
+    }
+  };
 
   // This function will be triggered when the "Go to Previous" button is clicked
   const handlePrevious = () => {
-    // Fetch the form data from localStorage
     const savedData = JSON.parse(localStorage.getItem('ManageTestExecutionStatus'));
-
     if (savedData) {
-      setFormData(savedData); // Restore the form data from localStorage
-    } else {
-      console.log('No data found in localStorage.');
+      setFormData(savedData);
     }
 
-    // Navigate to the previous page (can be a specific path or use -1 for going back to the last visited page)
-    // navigate('AdminPanel/ManageDefects'); // This will go back to the previous page
-    navigate(-1); // This will go back to the previous page
+    // Get user role and navigate accordingly
+    const currentRole = getUserRoleFromToken();
+    console.log('Current user role for previous:', currentRole); // Debug log
+
+    if (currentRole === 'admin') {
+      navigate('/AdminPanel/ManageTestExecutionStatus');
+    } else {
+      navigate('/TestLead/ManageTestExecutionStatus');
+    }
   };
 
 

@@ -6,7 +6,7 @@
 // const AdminScrumBuzz = () => {
 //   const [selectedProject, setSelectedProject] = useState('');
 //   const [projects, setProjects] = useState([]);
-//   const [errors, setErrors] = useState({});
+//   const [errors, setErrors] = useState({});  
 //   const [loading, setLoading] = useState(false);
 //   const [defects, setDefects] = useState([]);
 //   const [scrums, setScrums] = useState([]); // Scrum details for selected project
