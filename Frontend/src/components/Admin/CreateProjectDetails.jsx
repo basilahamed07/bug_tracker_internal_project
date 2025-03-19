@@ -64,7 +64,7 @@ const CreateProjectDetails = ({ projectNameFromParent }) => {
     }
 
     try {
-      const response = await fetch('http://localhost:5000/create-project-details', {
+      const response = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms/create-project-details', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

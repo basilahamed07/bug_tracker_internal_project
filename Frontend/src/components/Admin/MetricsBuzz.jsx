@@ -1,74 +1,64 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Button, Card } from 'react-bootstrap';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom'; // Use useNavigate instead of useHistory
+import { useNavigate } from 'react-router-dom';
+import BackButton from '../common/BackButton';
 
 const ManageBuzz = () => {
   const [selectedProject, setSelectedProject] = useState('');
-  const [projects, setProjects] = useState([]); // Store projects here
+  const [projects, setProjects] = useState([]);
   const [errors, setErrors] = useState({});
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [defects, setDefects] = useState([]);
-  //inside modal
   const [user_role, setUserRole] = useState(false);
+  const navigate = useNavigate();
 
-  const navigate = useNavigate(); // Initialize useNavigate for navigation
-
+  // Added useEffect with proper loading state management
   useEffect(() => {
-    fetchUserProjects(); // Fetch projects for the logged-in user
-    // You can add any necessary effect here, such as resetting the selected project
-  }, [projects]);
+    fetchUserProjects();
+  }, []); // Empty dependency array means it runs only once on mount
 
-
-
-    // Fetch defects for the selected project
-    const fetchDefects = async (project_name_id) => {
-        const token = sessionStorage.getItem('access_token');
-        try {
-          const response = await axios.get(`http://localhost:5000/new_defects/${project_name_id}`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'application/json'
-            }
-          });
-          setDefects(response.data);
-        } catch (error) {
-          console.error('Error fetching defects:', error);
+  const fetchDefects = async (project_name_id) => {
+    const token = sessionStorage.getItem('access_token');
+    try {
+      const response = await axios.get(`https://frt4cnbr-5000.inc1.devtunnels.ms/new_defects/${project_name_id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
-      };
-    
-      // Fetch projects for the logged-in user 
-      const fetchUserProjects = async () => {
-        const token = sessionStorage.getItem('access_token');
-        try {
-          const response = await axios.get('http://localhost:5000/get-user-projects', {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'application/json'
-            }
-          });
-          setProjects(response.data.projects);
-          // console.log("SDFGHJKHGFDS : " , response.data.user_role)
-          setUserRole(response.data.user_role)
-          // console.log("projects details : ", response)  // Store the user's projects
-        } catch (error) {
-          console.error('Error fetching user projects:', error);
+      });
+      setDefects(response.data);
+    } catch (error) {
+      console.error('Error fetching defects:', error);
+      setErrors(prev => ({ ...prev, fetch: 'Failed to fetch defects' }));
+    }
+  };
+
+  const fetchUserProjects = async () => {
+    const token = sessionStorage.getItem('access_token');
+    setLoading(true);
+    try {
+      const response = await axios.get('https://frt4cnbr-5000.inc1.devtunnels.ms/get-user-projects', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
-      };
-
-
+      });
+      setProjects(response.data.projects);
+      setUserRole(response.data.user_role);
+    } catch (error) {
+      console.error('Error fetching user projects:', error);
+      setErrors(prev => ({ ...prev, fetch: 'Failed to fetch projects' }));
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleProjectStatusUpdate = (projectId) => {
     if (!projectId) {
       alert('Please select a project to update.');
       return;
     }
-
-    // // Set showCreateDetails to true
-    // setShowCreateDetails(true);
-
-    // Store selected project in sessionStorage
-    // Assuming projectName is available, use it to store in sessionStorage
     sessionStorage.setItem('projectName', projectId); // Replace projectId with the actual project name if needed
 
     // Optionally, log to check sessionStorage
@@ -81,8 +71,11 @@ const ManageBuzz = () => {
 
   return (
     <div style={{ width: '45%' }}>
+      <BackButton />
       {loading ? (
-        <p>Loading...</p>
+        <div>Loading projects...</div>
+      ) : errors.fetch ? (
+        <div className="alert alert-danger">{errors.fetch}</div>
       ) : (
         <div>
           {projects.length === 0 ? (

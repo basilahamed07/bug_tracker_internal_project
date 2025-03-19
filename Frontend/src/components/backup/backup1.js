@@ -38,7 +38,7 @@
 // //         return;
 // //       }
 
-// //       const response = await fetch('http://localhost:5000/tester-billable', {
+// //       const response = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms/tester-billable', {
 // //         method: 'GET',
 // //         headers: {
 // //           'Content-Type': 'application/json',
@@ -93,7 +93,7 @@
 // //   // Handle creation of a new tester (for example, adding a tester)
 // //   const handleCreateTester = async (testerName, type) => {
 // //     try {
-// //       const response = await fetch('http://localhost:5000/tester-billable', {
+// //       const response = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms/tester-billable', {
 // //         method: 'POST',
 // //         headers: { 'Content-Type': 'application/json' },
 // //         body: JSON.stringify({ tester_name: testerName, type }),
@@ -131,7 +131,7 @@
 // //       if (!accessToken) throw new Error('User is not authenticated');
 
 // //       setIsPending(true);
-// //       const response = await fetch('http://localhost:5000/create-project', {
+// //       const response = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms/create-project', {
 // //         method: 'POST',
 // //         headers: {
 // //           'Content-Type': 'application/json',
@@ -365,7 +365,7 @@
 //         return;
 //       }
 
-//       const response = await fetch('http://localhost:5000/tester-billable', {
+//       const response = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms/tester-billable', {
 //         method: 'GET',
 //         headers: {
 //           'Content-Type': 'application/json',
@@ -473,7 +473,7 @@
 //       const selectedTesters = JSON.parse(sessionStorage.getItem('selectedTesters'))?.testers || [];
 
 //       // Send the project creation request
-//       const response = await fetch('http://localhost:5000/create-project', {
+//       const response = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms/create-project', {
 //         method: 'POST',
 //         headers: {
 //           'Content-Type': 'application/json',
@@ -717,7 +717,7 @@
 //         return;
 //       }
 
-//       const response = await fetch('http://localhost:5000/tester-billable', {
+//       const response = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms/tester-billable', {
 //         method: 'GET',
 //         headers: {
 //           'Content-Type': 'application/json',
@@ -824,7 +824,7 @@
 //       };
   
 //       // Send request to the backend
-//       const response = await fetch('http://localhost:5000/create-project', {
+//       const response = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms/create-project', {
 //         method: 'POST',
 //         headers: {
 //           'Content-Type': 'application/json',
@@ -1154,8 +1154,8 @@
 //         return;
 //       }
 
-//       // const response = await fetch('http://localhost:5000/tester-billable', {
-//       const response = await fetch('http://localhost:5000/tester-billable', {
+//       // const response = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms/tester-billable', {
+//       const response = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms/tester-billable', {
 //         method: 'GET',
 //         headers: {
 //           'Content-Type': 'application/json',
@@ -1234,7 +1234,7 @@
 //         // testers: testersToSubmit,
 //       };
   
-//       const response = await fetch('http://localhost:5000/create-project', {
+//       const response = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms/create-project', {
 //         method: 'POST',
 //         headers: {
 //           'Content-Type': 'application/json',
@@ -1283,7 +1283,7 @@
 //       ];
   
 //       // Step 1: Create the testers
-//       const createTestersResponse = await fetch('http://localhost:5000/tester-billable', {
+//       const createTestersResponse = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms/tester-billable', {
 //         method: 'POST',
 //         headers: {
 //           'Content-Type': 'application/json',
@@ -1315,7 +1315,7 @@
 //         ai_used: formData.ai_used === 'Yes', // Assuming 'Yes' is a boolean
 //       };
   
-//       const response2 = await fetch('http://localhost:5000/create-project-details', {
+//       const response2 = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms/create-project-details', {
 //         method: 'POST',
 //         headers: {
 //           'Content-Type': 'application/json',

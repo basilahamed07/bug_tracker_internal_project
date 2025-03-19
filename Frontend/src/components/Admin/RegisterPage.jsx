@@ -18,7 +18,7 @@ const RegisterPage = () => {
 
     // Send the POST request to the Flask backend
     try {
-      const response = await axios.post('http://localhost:5000/register', {
+      const response = await axios.post('https://frt4cnbr-5000.inc1.devtunnels.ms/register', {
         username: username,
         password: password,
         role: role, // Include the selected role

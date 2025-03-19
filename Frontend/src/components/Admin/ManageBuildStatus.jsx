@@ -4,6 +4,7 @@ import { Button, Table, Form, Card, Row, Col, Modal } from 'react-bootstrap';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom'; // Use useNavigate instead of useHistory
 import { getUserRoleFromToken } from '../../utils/tokenUtils';
+import BackButton from '../common/BackButton';
 
 const ManageBuildStatus = () => {
   const [buildStatuses, setBuildStatuses] = useState([]);
@@ -69,7 +70,7 @@ const ManageBuildStatus = () => {
 
     const token = sessionStorage.getItem('access_token');
     try {
-      const response = await axios.get(`http://localhost:5000/build_status/${projectId}`, {
+      const response = await axios.get(`https://frt4cnbr-5000.inc1.devtunnels.ms/build_status/${projectId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -85,7 +86,7 @@ const ManageBuildStatus = () => {
   const fetchUserProjects = async () => {
     const token = sessionStorage.getItem('access_token');
     try {
-      const response = await axios.get('http://localhost:5000/get-user-projects', {
+      const response = await axios.get('https://frt4cnbr-5000.inc1.devtunnels.ms/get-user-projects', {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -147,8 +148,8 @@ const ManageBuildStatus = () => {
     const token = sessionStorage.getItem('access_token');
     const method = editingStatus ? 'PUT' : 'POST';
     const url = editingStatus
-      ? `http://localhost:5000/build_status/${editingStatus.id}`
-      : 'http://localhost:5000/build_status';
+      ? `https://frt4cnbr-5000.inc1.devtunnels.ms/build_status/${editingStatus.id}`
+      : 'https://frt4cnbr-5000.inc1.devtunnels.ms/build_status';
 
     try {
       const response = await axios({
@@ -184,7 +185,7 @@ const ManageBuildStatus = () => {
     if (window.confirm('Are you sure you want to delete this status?')) {
       const token = sessionStorage.getItem('access_token');
       try {
-        const response = await axios.delete(`http://localhost:5000/build_status/${id}`, {
+        const response = await axios.delete(`https://frt4cnbr-5000.inc1.devtunnels.ms/build_status/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -219,7 +220,7 @@ const ManageBuildStatus = () => {
     // Fetch user projects when the "View" button is clicked
     const token = sessionStorage.getItem('access_token');
     try {
-      const response = await axios.get('http://localhost:5000/get-user-projects', {
+      const response = await axios.get('https://frt4cnbr-5000.inc1.devtunnels.ms/get-user-projects', {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -243,7 +244,7 @@ const ManageBuildStatus = () => {
   const handleViewDefects = async (projectId) => {
     const token = sessionStorage.getItem('access_token');
     try {
-      const response = await axios.get(`http://localhost:5000/build_status/${projectId}`, {
+      const response = await axios.get(`https://frt4cnbr-5000.inc1.devtunnels.ms/build_status/${projectId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -323,6 +324,7 @@ const ManageBuildStatus = () => {
 
   return (
     <div className="container mt-5">
+      <BackButton />
       <Card>
         <Card.Header
           as="h5"

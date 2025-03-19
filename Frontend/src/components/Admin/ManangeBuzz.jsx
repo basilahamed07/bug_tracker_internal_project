@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import { getUserRoleFromToken } from '../../utils/tokenUtils';
+import BackButton from '../common/BackButton';
 
 const ManageBuzz = () => {
   const [selectedProject, setSelectedProject] = useState('');
@@ -80,6 +81,8 @@ const ManageBuzz = () => {
 
   return (
     <div style={{ width: '45%' }}>
+      <BackButton />
+
       {loading ? (
         <p>Loading...</p>
       ) : (
@@ -114,18 +117,20 @@ const ManageBuzz = () => {
 
                   <br />
 
-                  <Button
-                    variant="primary"
-                    onClick={() => handleProjectStatusUpdate(selectedProject)}
-                    style={{
-                      fontWeight: 'bold',
-                      color: '#ffffff',
-                      backgroundColor: '#000d6b',
-                      borderColor: '#000d6b',
-                    }}
-                  >
-                    Proceed to update the Status
-                  </Button>
+                  <div className="d-flex justify-content-between">
+                    <Button
+                      variant="primary"
+                      onClick={() => handleProjectStatusUpdate(selectedProject)}
+                      style={{
+                        fontWeight: 'bold',
+                        color: '#ffffff',
+                        backgroundColor: '#000d6b',
+                        borderColor: '#000d6b',
+                      }}
+                    >
+                      Proceed to update the Status
+                    </Button>
+                  </div>
                 </Form>
               </Card.Body>
             </Card>

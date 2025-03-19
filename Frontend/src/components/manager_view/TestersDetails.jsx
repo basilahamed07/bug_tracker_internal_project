@@ -36,7 +36,7 @@ const TestersDetails = () => {
         },
       };
 
-      const apiUrl = `http://localhost:5000/project-base-billable/${projectId}`;
+      const apiUrl = `https://frt4cnbr-5000.inc1.devtunnels.ms/project-base-billable/${projectId}`;
       const response = await axios.get(apiUrl, config);
 
       if (response.status === 200) {
@@ -109,7 +109,7 @@ const TestersDetails = () => {
       {/* Heading for Tester Details */}
       <Row className="mb-4">
         <Col>
-          <h2>Tester Details</h2>
+          <h2>Team Members</h2>
         </Col>
       </Row>
 
@@ -117,7 +117,8 @@ const TestersDetails = () => {
       <Row className="mb-4">
         <Col className="d-flex justify-content-start">
           {/* Back Button, smaller size, on the left side */}
-          <Button variant="primary" onClick={() => navigate(-1)} className="btn-sm">
+          <Button variant="primary" onClick={() => navigate(-1)} className="btn-sm"
+            style={{ backgroundColor: '#000d6b', color: '#ffffff' }}>
             Go Back
           </Button>
         </Col>
@@ -126,10 +127,10 @@ const TestersDetails = () => {
       {/* Render tables for billable and non-billable testers */}
       <Row className="mb-4">
         <Col md={6}>
-          {renderTable(billableTesters, 'Billable Testers')}
+          {renderTable(billableTesters, 'Billable')}
         </Col>
         <Col md={6}>
-          {renderTable(nonBillableTesters, 'Non-Billable Testers')}
+          {renderTable(nonBillableTesters, 'Non-Billable')}
         </Col>
       </Row>
     </div>

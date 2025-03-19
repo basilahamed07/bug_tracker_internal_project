@@ -28,7 +28,7 @@ const FixedChatBot = () => {
     setErrorMessage(''); // Reset error message
 
     try {
-      const response = await fetch('http://localhost:5000/sample_question', {
+      const response = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms/sample_question', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

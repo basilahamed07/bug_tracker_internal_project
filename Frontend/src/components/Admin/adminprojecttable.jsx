@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Table, Button, Form, Modal, Alert } from 'react-bootstrap';
-import { FaEdit, FaTrash, FaTimes } from 'react-icons/fa'; // Import the edit and delete icons
+import { FaEdit,FaTrash, FaTimes } from 'react-icons/fa'; // Update the imports
 
 const AdminProjectTable = () => {
   const [projects, setProjects] = useState([]);
@@ -38,7 +38,7 @@ const [selectedMonth, setSelectedMonth] = useState('');
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const response = await fetch('http://localhost:5000//project-details', {
+        const response = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms//project-details', {
           headers: {
             'Authorization': `Bearer ${sessionStorage.getItem('access_token')}`,
           },
@@ -55,7 +55,7 @@ const [selectedMonth, setSelectedMonth] = useState('');
 
   const fetchBillableAndNonBillable = async (billableIds, nonBillableIds) => {
     try {
-      const response = await fetch('http://localhost:5000//get_tester_details', {
+      const response = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms//get_tester_details', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${sessionStorage.getItem('access_token')}`,
@@ -140,7 +140,7 @@ const [selectedMonth, setSelectedMonth] = useState('');
 
     // Send the updated project data to the backend
     try {
-      const response = await fetch(`http://localhost:5000//update-project-details/${selectedProject.id}`, {
+      const response = await fetch(`https://frt4cnbr-5000.inc1.devtunnels.ms//update-project-details/${selectedProject.id}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${sessionStorage.getItem('access_token')}`,
@@ -191,7 +191,7 @@ const [selectedMonth, setSelectedMonth] = useState('');
     const confirmDelete = window.confirm('Are you sure you want to delete this project?');
     if (confirmDelete) {
       try {
-        const response = await fetch(`http://localhost:5000//delete-project/${id}`, {
+        const response = await fetch(`https://frt4cnbr-5000.inc1.devtunnels.ms//delete-project/${id}`, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${sessionStorage.getItem('access_token')}`,
@@ -219,7 +219,7 @@ const [selectedMonth, setSelectedMonth] = useState('');
     setShowAddTesterModal(true);
   
     try {
-      const response = await fetch('http://localhost:5000//tester-billable', {
+      const response = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms//tester-billable', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${sessionStorage.getItem('access_token')}`,
@@ -306,47 +306,43 @@ const [selectedMonth, setSelectedMonth] = useState('');
       return;
     }
   
-    const url = `http://localhost:5000/generate_pdf/${projectId}`; // API endpoint with project ID
+    const url = `https://frt4cnbr-5000.inc1.devtunnels.ms/generate_pdf/${projectId}`;
     console.log("Requesting report generation for project:", projectId, "and month:", selectedMonth);
   
     try {
       const response = await fetch(url, {
-        method: 'POST',  // Use POST instead of GET
+        method: 'POST',
         headers: {
           'Authorization': `Bearer ${sessionStorage.getItem('access_token')}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ month: selectedMonth }), // Send the selected month in the body as JSON
+        body: JSON.stringify({ month: selectedMonth }),
       });
   
       console.log("Month response from backend : ", response);
   
+      // Check if the response is JSON (error message) or blob (PDF file)
+      const contentType = response.headers.get('content-type');
+      
+      if (contentType && contentType.includes('application/json')) {
+        const jsonResponse = await response.json();
+        alert(jsonResponse.message || 'No data found for the selected month.');
+        return;
+      }
+  
       if (!response.ok) {
         throw new Error('Failed to generate report');
       }
-
-      const blob = await response.blob(); 
   
-      // Create a URL for the PDF blob and open it in a new window/tab
+      const blob = await response.blob();
       const urlBlob = window.URL.createObjectURL(blob);
-      window.open(urlBlob, '_blank'); // Opens the PDF in a new tab
+      window.open(urlBlob, '_blank');
   
-      // Force the download by using the download attribute
-      // link.setAttribute('download', `report_${projectId}_${selectedMonth}.pdf`);
-  
-      // // Trigger the download
-      // link.click();
-  
-      // // Clean up the object URL after the download is triggered
-      // window.URL.revokeObjectURL(urlBlob);
-  
-      alert('Report generated successfully!');
     } catch (error) {
       console.error('Error:', error);
-      alert('Error generating report. Please try again.');
+      alert('Failed to generate report: ' + error.message);
     }
   };
-  
   
   
 
@@ -390,10 +386,10 @@ const [selectedMonth, setSelectedMonth] = useState('');
                     <td>{project.automation ? project.automation : "No Details" }</td>
                     <td>{project.ai_used ? project.ai_used : "No Details"}</td>
                     <td>
-                      <Button variant="primary" size="sm" onClick={() => handleEdit(project)}>
+                      <Button variant="primary" size="sm"style={{backgroundColor:"#000D6B"}} onClick={() => handleEdit(project)}>
                         <FaEdit />
-                      </Button>
-                      <Button variant="danger" size="sm" onClick={() => handleDelete(project.id)}>
+                      </Button>&nbsp;
+                      <Button variant="danger" size="sm"  onClick={() => handleDelete(project.id)}>
                         <FaTrash />
                       </Button>
                     </td>
@@ -639,7 +635,8 @@ const [selectedMonth, setSelectedMonth] = useState('');
 
       <Button
         variant="primary"
-        onClick={() => handleGenerateReport(selectedProject.project_name_id )} // Pass selected project ID and month
+        onClick={() => handleGenerateReport(selectedProject.project_name_id )}
+        style={{ backgroundColor: '#000D6B', borderColor: '#000D6B' }}
       >
         Generate Report
       </Button>

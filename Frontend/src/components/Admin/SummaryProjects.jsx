@@ -22,7 +22,7 @@ const ManageBuzz = () => {
   const fetchDefects = async (project_name_id) => {
     const token = sessionStorage.getItem('access_token');
     try {
-      const response = await axios.get(`http://localhost:5000/new_defects/${project_name_id}`, {
+      const response = await axios.get(`https://frt4cnbr-5000.inc1.devtunnels.ms/new_defects/${project_name_id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -37,7 +37,7 @@ const ManageBuzz = () => {
   const fetchUserProjects = async () => {
     const token = sessionStorage.getItem('access_token');
     try {
-      const response = await fetch('http://localhost:5000/project-details-manager-view', {
+      const response = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms/project-details-manager-view', {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',

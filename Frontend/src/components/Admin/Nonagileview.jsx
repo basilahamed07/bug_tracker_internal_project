@@ -2,9 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, Table, Alert, Spinner } from 'react-bootstrap';
 
 const Nonagileview = () => {
-  const [manualData, setManualData] = useState(null);
-  const [automationData, setAutomationData] = useState(null);
-  const [openDefects, setOpenDefects] = useState(null);
+  const [testingData, setTestingData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -18,47 +16,22 @@ const Nonagileview = () => {
           throw new Error('Missing required session data');
         }
 
-        // Fetch manual testing data
-        const manualResponse = await fetch(
-          `http://localhost:5000/testing-type/manual/latest/${projectId}`,
+        const response = await fetch(
+          `http://127.0.0.1:5000/testing-type/${projectId}`,
           {
             headers: {
               'Authorization': `Bearer ${token}`,
             }
           }
         );
+        console.log("response is",response);
 
-        // Fetch automation testing data
-        const automationResponse = await fetch(
-          `http://localhost:5000/testing-type/automation/latest/${projectId}`,
-          {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-            }
-          }
-        );
-
-        // Fetch open defects data
-        const defectsResponse = await fetch(
-          `http://localhost:5000/open_defact/${projectId}`,
-          {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-            }
-          }
-        );
-
-        if (!manualResponse.ok || !automationResponse.ok || !defectsResponse.ok) {
+        if (!response.ok) {
           throw new Error('Failed to fetch data');
         }
 
-        const manualResult = await manualResponse.json();
-        const automationResult = await automationResponse.json();
-        const defectsResult = await defectsResponse.json();
-
-        setManualData(manualResult);
-        setAutomationData(automationResult);
-        setOpenDefects(defectsResult);
+        const result = await response.json();
+        setTestingData(result);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -83,6 +56,17 @@ const Nonagileview = () => {
     return <Alert variant="danger">Error: {error}</Alert>;
   }
 
+  const getLatestDefectDetails = () => {
+    if (!testingData?.defect_details || testingData.defect_details.length === 0) {
+      return null;
+    }
+    return testingData.defect_details[testingData.defect_details.length - 1];
+  };
+
+  const getTestingDataByType = (type) => {
+    return testingData?.testing_entries?.find(entry => entry.type_of_testing === type);
+  };
+
   return (
     <div style={{ width: '80%', margin: 'auto' }}>
       <Card>
@@ -104,17 +88,26 @@ const Nonagileview = () => {
                 </tr>
               </thead>
               <tbody>
-                {manualData ? (
+                {testingData ? (
                   <tr>
-                    <td>{manualData.total_testcase}</td>
-                    <td>{manualData.tcexecution}</td>
-                    <td>{manualData.passed}</td>
-                    <td>{manualData.fail}</td>
-                    <td>{manualData.opendefact}</td>
+                    {(() => {
+                      const manualData = getTestingDataByType('Manual');
+                      return manualData ? (
+                        <>
+                          <td>{manualData.total_testcase}</td>
+                          <td>{manualData.tcexecution}</td>
+                          <td>{manualData.passed}</td>
+                          <td>{manualData.fail}</td>
+                          <td>{manualData.opendefact}</td>
+                        </>
+                      ) : (
+                        <td colSpan="5" className="text-center">No manual testing data available</td>
+                      );
+                    })()}
                   </tr>
                 ) : (
                   <tr>
-                    <td colSpan="5" className="text-center">No manual testing data available</td>
+                    <td colSpan="5" className="text-center">Loading...</td>
                   </tr>
                 )}
               </tbody>
@@ -135,17 +128,26 @@ const Nonagileview = () => {
                 </tr>
               </thead>
               <tbody>
-                {automationData ? (
+                {testingData ? (
                   <tr>
-                    <td>{automationData.total_testcase}</td>
-                    <td>{automationData.tcexecution}</td>
-                    <td>{automationData.passed}</td>
-                    <td>{automationData.fail}</td>
-                    <td>{automationData.opendefact}</td>
+                    {(() => {
+                      const automationData = getTestingDataByType('Automation');
+                      return automationData ? (
+                        <>
+                          <td>{automationData.total_testcase}</td>
+                          <td>{automationData.tcexecution}</td>
+                          <td>{automationData.passed}</td>
+                          <td>{automationData.fail}</td>
+                          <td>{automationData.opendefact}</td>
+                        </>
+                      ) : (
+                        <td colSpan="5" className="text-center">No automation testing data available</td>
+                      );
+                    })()}
                   </tr>
                 ) : (
                   <tr>
-                    <td colSpan="5" className="text-center">No automation testing data available</td>
+                    <td colSpan="5" className="text-center">Loading...</td>
                   </tr>
                 )}
               </tbody>
@@ -166,17 +168,26 @@ const Nonagileview = () => {
                 </tr>
               </thead>
               <tbody>
-                {openDefects ? (
+                {testingData ? (
                   <tr>
-                    <td>{openDefects.total_defect}</td>
-                    <td>{openDefects.critical}</td>
-                    <td>{openDefects.high}</td>
-                    <td>{openDefects.medium}</td>
-                    <td>{openDefects.low}</td>
+                    {(() => {
+                      const defect_details = getLatestDefectDetails();
+                      return defect_details ? (
+                        <>
+                          <td>{defect_details.total_defect}</td>
+                          <td>{defect_details.critical}</td>
+                          <td>{defect_details.high}</td>
+                          <td>{defect_details.medium}</td>
+                          <td>{defect_details.low}</td>
+                        </>
+                      ) : (
+                        <td colSpan="5" className="text-center">No defect data available</td>
+                      );
+                    })()}
                   </tr>
                 ) : (
                   <tr>
-                    <td colSpan="5" className="text-center">No defect data available</td>
+                    <td colSpan="5" className="text-center">Loading...</td>
                   </tr>
                 )}
               </tbody>

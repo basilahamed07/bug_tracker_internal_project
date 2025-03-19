@@ -96,7 +96,7 @@ const AddProjectWithDetails = ({ projectNameProp }) => {
         return;
       }
 
-      const response = await axios.get('http://localhost:5000/pending-project', {
+      const response = await axios.get('https://frt4cnbr-5000.inc1.devtunnels.ms/pending-project', {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -139,8 +139,8 @@ const handleProjectUpdate = (project) => {
         return;
       }
 
-      const response = await fetch('http://localhost:5000/tester-billable', {
-        // const response = await fetch('http://localhost:5000/tester-billable', {
+      const response = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms/tester-billable', {
+        // const response = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms/tester-billable', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -215,7 +215,7 @@ const handleProjectUpdate = (project) => {
         project_name: projectName,
       };
 
-      const response = await fetch('http://localhost:5000/create-project', {
+      const response = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms/create-project', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -276,8 +276,8 @@ const handleProjectUpdate = (project) => {
         })),
       ];
 
-      const createTestersResponse = await fetch('http://localhost:5000/tester-billable', {
-        // const createTestersResponse = await fetch('http://localhost:5000/tester-billable', {
+      const createTestersResponse = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms/tester-billable', {
+        // const createTestersResponse = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms/tester-billable', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -325,8 +325,8 @@ const handleProjectUpdate = (project) => {
         return; // Stop the form submission if validation fails
       }
 
-      const response2 = await fetch('http://localhost:5000/create-project-details', {
-        // const response2 = await fetch('http://localhost:5000/create-project-details', {
+      const response2 = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms/create-project-details', {
+        // const response2 = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms/create-project-details', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

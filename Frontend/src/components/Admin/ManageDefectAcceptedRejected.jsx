@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { FaEdit, FaTrashAlt } from 'react-icons/fa';
 import { Button, Table, Form, Card, Row, Col, Modal } from 'react-bootstrap';
 import axios from 'axios';
-
+import BackButton from '../common/BackButton';
 import { useNavigate } from 'react-router-dom'; // Use useNavigate instead of useHistory
 import { getUserRoleFromToken } from '../../utils/tokenUtils'; // Import getUserRoleFromToken
  
@@ -79,7 +79,7 @@ const ManageDefectAcceptedRejected = () => {
     
     const token = sessionStorage.getItem('access_token');
     try {
-      const response = await axios.get(`http://localhost:5000/defect_accepted_rejected/${projectId}`, {
+      const response = await axios.get(`https://frt4cnbr-5000.inc1.devtunnels.ms/defect_accepted_rejected/${projectId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -94,7 +94,7 @@ const ManageDefectAcceptedRejected = () => {
   const fetchUserProjects = async () => {
     const token = sessionStorage.getItem('access_token');
     try {
-      const response = await axios.get('http://localhost:5000/get-user-projects', {
+      const response = await axios.get('https://frt4cnbr-5000.inc1.devtunnels.ms/get-user-projects', {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -115,7 +115,7 @@ const ManageDefectAcceptedRejected = () => {
   const fetchDefectsForProject = async (projectId) => {
     const token = sessionStorage.getItem('access_token');
     try {
-      const response = await axios.get(`http://localhost:5000/defect_accepted_rejected/${projectId}`, {
+      const response = await axios.get(`https://frt4cnbr-5000.inc1.devtunnels.ms/defect_accepted_rejected/${projectId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -179,8 +179,8 @@ const ManageDefectAcceptedRejected = () => {
     const token = sessionStorage.getItem('access_token');
     const method = editingStatus ? 'PUT' : 'POST';
     const url = editingStatus
-      ? `http://localhost:5000/defect_accepted_rejected/${editingStatus.id}`
-      : 'http://localhost:5000/defect_accepted_rejected';
+      ? `https://frt4cnbr-5000.inc1.devtunnels.ms/defect_accepted_rejected/${editingStatus.id}`
+      : 'https://frt4cnbr-5000.inc1.devtunnels.ms/defect_accepted_rejected';
 
     try {
       const response = await axios({
@@ -215,7 +215,7 @@ const ManageDefectAcceptedRejected = () => {
     if (window.confirm('Are you sure you want to delete this status?')) {
       const token = sessionStorage.getItem('access_token');
       try {
-        const response = await axios.delete(`http://localhost:5000/defect_accepted_rejected/${id}`, {
+        const response = await axios.delete(`https://frt4cnbr-5000.inc1.devtunnels.ms/defect_accepted_rejected/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -336,6 +336,7 @@ const ManageDefectAcceptedRejected = () => {
 
   return (
     <div className="container mt-5">
+      <BackButton />
       <Card>
         <Card.Header
           as="h5"

@@ -17,6 +17,17 @@ const ScrumDetails = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 3; // Number of items per page
 
+    // Add this utility function at the top level of your component
+    const formatDate = (dateString) => {
+        if (!dateString) return 'N/A';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        });
+    };
+
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -24,7 +35,7 @@ const ScrumDetails = () => {
                 
                 // Fetch scrum details
                 const scrumResponse = await axios.get(
-                  `http://localhost:5000/agile_details/${project_name_id}`,
+                  `https://frt4cnbr-5000.inc1.devtunnels.ms/agile_details/${project_name_id}`,
                   {
                     headers: {
                       Authorization: `Bearer ${token}`,
@@ -38,7 +49,7 @@ const ScrumDetails = () => {
         
                 // Fetch billable status with updated handling
                 const billableResponse = await axios.get(
-                  `http://localhost:5000/project-base-billable/${project_name_id}`,
+                  `https://frt4cnbr-5000.inc1.devtunnels.ms/project-base-billable/${project_name_id}`,
                   {
                     headers: {
                       Authorization: `Bearer ${token}`,
@@ -99,11 +110,11 @@ const ScrumDetails = () => {
 
     return (
         <div className="container mt-4">
-            <h2 className="text-center" style={{ color: "#000d6b" }}>
-                Project Information - {projectName} {/* Display the project name here */}
-            </h2>
+            <h1 className="text-center" style={{ color: "#000d6b" }}>
+            <strong>{projectName}</strong> {/* Display the project name here */}
+            </h1>
 
-            <div className="team-cards-container d-flex justify-content-center mb-4">
+            {/* <div className="team-cards-container d-flex justify-content-center mb-4">
                 {currentScrums.map((scrum, index) => (
                     <div
                         key={index}
@@ -120,24 +131,81 @@ const ScrumDetails = () => {
                         </div>
                     </div>
                 ))}
+            </div> */}
+            <div className="team-cards-container d-flex justify-content-center mb-4">
+    {currentScrums.map((scrum, index) => (
+        <div
+            key={index}
+            className="card scrum-card shadow-lg p-3 mb-4"
+            style={{
+                width: '18rem',
+                cursor: 'pointer',
+                transition: 'transform 0.3s ease',
+                textDecoration: 'none', // Ensures no underline on the card
+            }}
+            onClick={() => handleScrumClick(scrum)}
+        >
+            <div className="card-header text-white" style={{ backgroundColor: '#000d6b' }}>
+                <center><h5 style={{ textDecoration: 'underline', color: '#0DCAF0' }}>{scrum.scream_name}</h5></center> {/* Underlined for hyperlink look */}
             </div>
 
+            <div className="card-body" style={{ backgroundColor: '#f8f9fa', borderRadius: '8px', paddingLeft: '1.5rem' }}>
+            <center><h6>Tester : {scrum.tester_name}</h6></center>
+            </div>
+        </div>
+    ))}
+</div>
+
+
             <div className="card">
-                <div className="card-header" style={{ backgroundColor: '#000d6b', color: 'white' }}>
-                    <h5>Scrum Members</h5>
+                <div className="card-header" 
+                     style={{ 
+                         backgroundColor: '#000d6b', 
+                         color: 'white',
+                         display: 'flex',
+                         alignItems: 'center',
+                         justifyContent: 'space-between',
+                         alignItems: 'center'
+                     }}
+                >
+                    <h5 style={{ 
+                margin: 0,
+                position: 'absolute',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                textAlign: 'center',
+            }}>Scrum Members</h5>
+                    <a 
+                        href={`/ManagerView/ai_insist/${project_name_id}`}
+                        className="btn btn-outline-light btn-sm"
+                        rel="noopener noreferrer"
+                        style={{
+                            transition: 'all 0.3s ease',
+                        }}
+                        onMouseOver={(e) => {
+                            e.target.style.backgroundColor = 'black';
+                            e.target.style.color = 'white';
+                        }}
+                        onMouseOut={(e) => {
+                            e.target.style.backgroundColor = 'transparent';
+                            e.target.style.color = 'white';
+                        }}
+                    >
+                        AI Insight-TBD
+                    </a>
                 </div>
                 <div className="card-body">
                     <table className="table table-bordered">
                         <thead className="table-light">
                             <tr>
-                                <th>RESOURCE NAME</th>
-                                <th>JOIN DATE</th>
-                                <th>PRIOR EXP</th>
-                                <th>CPT EXP</th>
-                                <th>TOTAL EXP</th>
-                                <th>SKILLS</th>
-                                <th>BILLABLE STATUS</th> {/* New column */}
-                            </tr>
+                                <th>Name</th>
+                                <th>Joining Date</th>
+                                <th>Prior Experience</th>
+                                <th>Current Project Experience</th>
+                                <th>Total Experience</th>
+                                <th>Skills</th>
+                                <th>Status</th>
+                               </tr>
                         </thead>
                         <tbody>
                             {currentScrums.map((scrum, index) => {
@@ -150,7 +218,7 @@ const ScrumDetails = () => {
                                 return (
                                     <tr key={index}>
                                         <td>{scrum.tester_name}</td>
-                                        <td>{new Date(scrum.join_date).toLocaleDateString()}</td>
+                                        <td>{formatDate(scrum.cpt_experience_start_date)}</td> {/* Changed from join_date */}
                                         <td>{scrum.total_experience}</td> {/* Prior Experience */}
                                         <td>{scrum.total_experience}</td> {/* CPT Experience */}
                                         <td>{totalExp}</td> {/* Total Experience (Prior + CPT) */}

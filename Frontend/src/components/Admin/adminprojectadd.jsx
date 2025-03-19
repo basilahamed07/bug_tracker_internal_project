@@ -105,7 +105,7 @@ const AdminAddProjectWithDetails = ({ projectNameProp }) => {
         return;
       }
 
-      const response = await fetch('http://localhost:5000/tester-billable', {
+      const response = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms/tester-billable', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -180,7 +180,7 @@ const AdminAddProjectWithDetails = ({ projectNameProp }) => {
         project_name: projectName,
       };
 
-      const response = await fetch('http://localhost:5000/create-project', {
+      const response = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms/create-project', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -343,7 +343,7 @@ const AdminAddProjectWithDetails = ({ projectNameProp }) => {
           project_name: formData.projectName,
         };
   
-        const response = await fetch('http://localhost:5000/create-project', {
+        const response = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms/create-project', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -372,7 +372,7 @@ const AdminAddProjectWithDetails = ({ projectNameProp }) => {
           })),
         ];
   
-        const createTestersResponse = await fetch('http://localhost:5000/tester-billable', {
+        const createTestersResponse = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms/tester-billable', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -398,7 +398,7 @@ const AdminAddProjectWithDetails = ({ projectNameProp }) => {
           ai_used_details: formData.ai_used === 'Yes' ? formData.ai_used_details : '',
         };
   
-        const response2 = await fetch('http://localhost:5000/create-project-details', {
+        const response2 = await fetch('https://frt4cnbr-5000.inc1.devtunnels.ms/create-project-details', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -421,7 +421,7 @@ const AdminAddProjectWithDetails = ({ projectNameProp }) => {
     // Set the project name in sessionStorage
     formData.projectName = projectName;
     console.log("DRFTGYHJKLJHGFDSFGHJKGFTDRDTFYGUHGYFTDRSEDTFYGUHJ : " , projectDataResponse);
-    sessionStorage.setItem('projectName', responseaftercreateproject.project_name);
+    sessionStorage.setItem('selectedProject', responseaftercreateproject.project_name);
   
       } catch (error) {
         setError('Error creating project details: ' + error.message);
@@ -475,6 +475,19 @@ const AdminAddProjectWithDetails = ({ projectNameProp }) => {
     <div className="container mt-5">
 
       {/* Create Project Details Form */}
+      <Button
+                    variant="secondary"
+                    onClick={() => navigate(-1)}
+                    style={{
+                      marginBottom: '20px',
+                      fontWeight: 'bold',
+                      color: '#ffffff',
+                      backgroundColor: '#000D6B',
+                      borderColor: '#6c757d',
+                    }}
+                  >
+                    Back
+                  </Button>
       
         <Card className="mt-4 shadow-lg">
           <Card.Header as="h4" style={{ backgroundColor: '#000d6b', color: '#ffffff', borderRadius: '10px 10px 0 0', padding: '15px' }}>
