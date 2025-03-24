@@ -35,7 +35,7 @@ const SlidingAuth = () => {
     e.preventDefault();
     if (validateSignIn()) {
       try {
-        const response = await axios.post('https://frt4cnbr-5000.inc1.devtunnels.ms/login', signInData);
+        const response = await axios.post('http://localhost:5000/login', signInData);
 
         if (response.status === 200) {
           const { access_token, user } = response.data;
