@@ -446,9 +446,14 @@ class StoryDetails(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     story_name = db.Column(db.String(200), nullable=False)
     story_point = db.Column(db.Integer, nullable=False)
+    story_consumed = db.Column(db.Integer, nullable=True)
     status = db.Column(db.String(50), nullable=False, default="Incomplete")
     completed_percentage = db.Column(db.Float, nullable=False)
     manual_or_automation = db.Column(db.String(50), nullable=False, default="manual")
+    target_date = db.Column(db.Date, nullable=True)
+    actual_hour = db.Column(db.Integer, nullable=True, default=0)  # Integer format
+    estimated_hour = db.Column(db.Integer, nullable=True, default=0)  # Integer format
+
     
     # Foreign key to link StoryDetails to Testers table
     tester_name_id = db.Column(db.Integer, db.ForeignKey("testers.id"), nullable=False)
@@ -468,9 +473,14 @@ class StoryDetails(db.Model):
             'story_name': self.story_name,
             'story_point': self.story_point,
             'status': self.status,
+            'tester_name': self.tester_name.tester_name.tester_name,
+            'Story_consumed': self.story_consumed,
             'completed_percentage': self.completed_percentage,
             'manual_or_automation': self.manual_or_automation,
-            "tester_id":self.tester_name_id
+            "tester_id":self.tester_name_id,
+            "target_date":self.target_date,
+            "actual_hour":self.actual_hour,
+            "estimated_hour":self.estimated_hour
         }
 
 

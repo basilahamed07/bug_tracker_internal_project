@@ -51,7 +51,7 @@ const MetricsForm = () => {
         return;
       }
 
-      const response = await axios.get(' http://localhost:5000/project-details', {
+      const response = await axios.get(' https://h25ggll0-5000.inc1.devtunnels.ms/project-details', {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -173,7 +173,7 @@ const handleChange = (e, section, field) => {
     }
   
     try {
-      const response = await fetch(' http://localhost:5000/create-matrix-inputs', {
+      const response = await fetch(' https://h25ggll0-5000.inc1.devtunnels.ms/create-matrix-inputs', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -216,7 +216,7 @@ const handleChange = (e, section, field) => {
         return;
       }
 
-      const response = await axios.get(` http://localhost:5000/get-matrix-inputs/${selectedProjectId}`, {
+      const response = await axios.get(` https://h25ggll0-5000.inc1.devtunnels.ms/get-matrix-inputs/${selectedProjectId}`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },

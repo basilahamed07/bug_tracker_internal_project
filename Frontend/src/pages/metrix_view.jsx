@@ -19,7 +19,7 @@ function MatrixView() {
       }
       setLoading(true);
       try {
-        const response = await axios.get('http://localhost:5000/project-details', {
+        const response = await axios.get('https://h25ggll0-5000.inc1.devtunnels.ms/project-details', {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -54,7 +54,7 @@ function MatrixView() {
 
       setLoading(true);
       try {
-        const response = await axios.get(`http://localhost:5000/get-matrix-inputs/${selectedProjectId}`, {
+        const response = await axios.get(`https://h25ggll0-5000.inc1.devtunnels.ms/get-matrix-inputs/${selectedProjectId}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -93,7 +93,7 @@ function MatrixView() {
     if (!confirmed) return; // If user clicks "No", do nothing
 
     try {
-      const response = await axios.delete(`http://localhost:5000/delete-matrix-inputs/${id}`, {
+      const response = await axios.delete(`https://h25ggll0-5000.inc1.devtunnels.ms/delete-matrix-inputs/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`
         }

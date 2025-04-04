@@ -82,11 +82,6 @@ const Routers = () => {
           </Route>
 
         <Route path="/TestLead" element={<AdminPanel />}>
-
-          {/* THIS CAN ACCESS FOR TESTLEAD AND ADMIN */}
-          {/* accessable for test_lead */}
-
-
           <Route path="add-project" element={<AddProject />} />
           <Route path="create-project-details" element={<CreateProjectDetails />} />
           <Route path="project-info" element={<ProjectInfo />} />
@@ -99,6 +94,7 @@ const Routers = () => {
           <Route path="ManageDefectAcceptedRejected" element={<ManageDefectAcceptedRejected />} />
           <Route path="MatrixInput" element={<MatrixInput />} />
           <Route path="ScrumTeamManagement" element={<ScrumTeamManagement />} />
+          <Route path="testingtype" element={<TestingType />} />
           {/* <Route path="Nonagile" element={<Nonagile />} /> */}
           <Route path="Nonagileview" element={<Nonagileview />} />
           {/* <Route path="ScrumTeamManagement" element={<ScrumTeamManagement />} /> */}
@@ -116,7 +112,7 @@ const Routers = () => {
           <Route path="add-project" element={<AddProject />} />
           <Route path="create-project-details" element={<CreateProjectDetails />} />
           {/* <Route path="project-report" element={<ProjectReport />} /> */}
-          <Route path="project-info" element={<ProjectInfo />} />
+          <Route path="project-info" element={<ProjectInfo />} /> 
           <Route path="project-trends" element={<ProjectTrends />} />
           <Route path="ManageDefects" element={<ManageDefects />} />
           <Route path="ManageBuzz" element={<ManageBuzz />} />

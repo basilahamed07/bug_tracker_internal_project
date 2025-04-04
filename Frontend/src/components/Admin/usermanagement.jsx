@@ -28,7 +28,7 @@ const UserManagement = () => {
   const fetchUsers = async () => {
     const token = sessionStorage.getItem('access_token');
     try {
-      const response = await axios.get('http://localhost:5000/all-users', {
+      const response = await axios.get('https://h25ggll0-5000.inc1.devtunnels.ms/all-users', {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -66,7 +66,7 @@ const UserManagement = () => {
     const token = sessionStorage.getItem('access_token');
     try {
       const response = await axios.post(
-        'http://localhost:5000/register',
+        'https://h25ggll0-5000.inc1.devtunnels.ms/register',
         { username, password, role },
         {
           headers: {
@@ -133,7 +133,7 @@ const UserManagement = () => {
       let response;
       if (editOption === 'password') {
         response = await axios.post(
-          'http://localhost:5000/password-update',
+          'https://h25ggll0-5000.inc1.devtunnels.ms/password-update',
           { userId: editUserId, password },
           {
             headers: {
@@ -144,7 +144,7 @@ const UserManagement = () => {
         );
       } else if (editOption === 'role') {
         response = await axios.post(
-          'http://localhost:5000/role-change',
+          'https://h25ggll0-5000.inc1.devtunnels.ms/role-change',
           { userId: editUserId, role },
           {
             headers: {

@@ -5,11 +5,9 @@ import React, { useState, useEffect } from 'react';
 import { FaEdit, FaTrashAlt } from 'react-icons/fa';
 import { Button, Table, Form, Card, Row, Col, Modal } from 'react-bootstrap';
 import axios from 'axios';
-
+import BackButton from '../common/BackButton';
 import { useNavigate } from 'react-router-dom'; // Use useNavigate instead of useHistory
 import { getUserRoleFromToken } from '../../utils/tokenUtils'; // Import getUserRoleFromToken
-
-
 
 const ManageTestExecutionStatus = () => {
   const [testStatuses, setTestStatuses] = useState([]);
@@ -80,7 +78,7 @@ const ManageTestExecutionStatus = () => {
   const fetchTestStatuses = async () => {
     const token = sessionStorage.getItem('access_token');
     try {
-      const response = await axios.get('http://localhost:5000/test_execution_status', {
+      const response = await axios.get('https://h25ggll0-5000.inc1.devtunnels.ms/test_execution_status', {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -95,7 +93,7 @@ const ManageTestExecutionStatus = () => {
   const fetchUserProjects = async () => {
     const token = sessionStorage.getItem('access_token');
     try {
-      const response = await axios.get('http://localhost:5000/get-user-projects', {
+      const response = await axios.get('https://h25ggll0-5000.inc1.devtunnels.ms/get-user-projects', {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -113,7 +111,7 @@ const ManageTestExecutionStatus = () => {
   const fetchDefects = async (projectId) => {
     const token = sessionStorage.getItem('access_token');
     try {
-      const response = await axios.get(`http://localhost:5000/test_execution_status/${projectId}`, {
+      const response = await axios.get(`https://h25ggll0-5000.inc1.devtunnels.ms/test_execution_status/${projectId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -207,8 +205,8 @@ const ManageTestExecutionStatus = () => {
     const token = sessionStorage.getItem('access_token');
     const method = editingStatus ? 'PUT' : 'POST';
     const url = editingStatus
-      ? `http://localhost:5000/test_execution_status/${editingStatus.id}`
-      : 'http://localhost:5000/test_execution_status';
+      ? `https://h25ggll0-5000.inc1.devtunnels.ms/test_execution_status/${editingStatus.id}`
+      : 'https://h25ggll0-5000.inc1.devtunnels.ms/test_execution_status';
 
     try {
       const response = await axios({
@@ -246,7 +244,7 @@ const ManageTestExecutionStatus = () => {
     if (window.confirm('Are you sure you want to delete this status?')) {
       const token = sessionStorage.getItem('access_token');
       try {
-        const response = await axios.delete(`http://localhost:5000/test_execution_status/${id}`, {
+        const response = await axios.delete(`https://h25ggll0-5000.inc1.devtunnels.ms/test_execution_status/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -383,6 +381,7 @@ const ManageTestExecutionStatus = () => {
 
   return (
     <div className="container mt-5">
+      <BackButton />
       <Card>
         <Card.Header
           as="h5"

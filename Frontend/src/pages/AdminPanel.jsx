@@ -109,7 +109,7 @@ const Sidebar = () => {
         }
 
         // Fetch the role using the API
-        const response = await axios.get('http://localhost:5000/get-role', {
+        const response = await axios.get('https://h25ggll0-5000.inc1.devtunnels.ms/get-role', {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -194,10 +194,10 @@ const Sidebar = () => {
                 <img src={Calender} alt="Manager View" />
                 <Text clicked={click} hovered={hovered}>Manager View</Text>
               </Item>
-              <Item activeClassName="active" to="/AdminPanel/Summary">
+              {/* <Item activeClassName="active" to="/AdminPanel/Summary">
                 <img src={expandall} alt="Manager View" />
                 <Text clicked={click} hovered={hovered}>Metrics Summary</Text>
-              </Item>
+              </Item> */}
             </>
           )}
         </SlickBar>
