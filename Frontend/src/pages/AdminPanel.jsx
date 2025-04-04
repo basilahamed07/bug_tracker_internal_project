@@ -15,37 +15,6 @@ const Container = styled.div`
   height: 100vh;
 `;
 
-// const Button = styled.button`
-//   background-color: var(--black);
-//   border: none;
-//   width: 2.5rem;
-//   height: 2.5rem;
-//   border-radius: 50%;
-//   margin: 0.5rem 0 0 0.5rem;
-//   cursor: pointer;
-//   display: flex;
-//   justify-content: center;
-//   align-items: center;
-//   position: relative;
-//   &::before,
-//   &::after {
-//     content: "";
-//     background-color: var(--white);
-//     height: 2px;
-//     width: 1rem;
-//     position: absolute;
-//     transition: all 0.3s ease;
-//   }
-//   &::before {
-//     top: ${(props) => (props.clicked ? "1.5" : "1rem")};
-//     transform: ${(props) => (props.clicked ? "rotate(135deg)" : "rotate(0)")};
-//   }
-//   &::after {
-//     top: ${(props) => (props.clicked ? "1.2" : "1.5rem")};
-//     transform: ${(props) => (props.clicked ? "rotate(-135deg)" : "rotate(0)")};
-//   }
-// `;
-
 const SidebarContainer = styled.div`
   background-color: var(--black);
   width: ${(props) => (props.clicked ? "12rem" : "3.5rem")};
@@ -140,7 +109,7 @@ const Sidebar = () => {
         }
 
         // Fetch the role using the API
-        const response = await axios.get('http://localhost:5000/get-role', {
+        const response = await axios.get('https://h25ggll0-5000.inc1.devtunnels.ms/get-role', {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -216,10 +185,6 @@ const Sidebar = () => {
                 <img src={expandall} alt="Manage input" />
                 <Text clicked={click} hovered={hovered}>Manage input</Text>
               </Item>
-              <Item activeClassName="active" to="/TestLead/MatrixInput">
-                <img src={Projects} alt="Add Project" />
-                <Text clicked={click} hovered={hovered}>Matrix Input</Text>
-              </Item>
             </>
           )}
 
@@ -229,10 +194,10 @@ const Sidebar = () => {
                 <img src={Calender} alt="Manager View" />
                 <Text clicked={click} hovered={hovered}>Manager View</Text>
               </Item>
-              <Item activeClassName="active" to="/AdminPanel/Summary">
+              {/* <Item activeClassName="active" to="/AdminPanel/Summary">
                 <img src={expandall} alt="Manager View" />
                 <Text clicked={click} hovered={hovered}>Metrics Summary</Text>
-              </Item>
+              </Item> */}
             </>
           )}
         </SlickBar>

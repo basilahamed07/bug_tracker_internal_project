@@ -9,7 +9,7 @@ import { jwtDecode } from 'jwt-decode';
 const CreateSprint = () => {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  const [stories, setStories] = useState([{ storyName: '', name: '', storyPoint: '', status: '', completion: '', type: '', tester_id: ''}]);
+  const [stories, setStories] = useState([{ storyName: '', name: '', storyPoint: '', status: '', completion: '', type: '', tester_id: '', story_consumed: null }]);
   const [testers, setTesters] = useState([]);
   const [sprints, setSprints] = useState([]);
   const [error, setError] = useState(null);
@@ -34,7 +34,7 @@ const CreateSprint = () => {
     const fetchUserRole = async () => {
       try {
         const token = sessionStorage.getItem('access_token');
-        const response = await fetch('http://localhost:5000/get-role', {
+        const response = await fetch('https://h25ggll0-5000.inc1.devtunnels.ms/get-role', {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -58,8 +58,7 @@ const CreateSprint = () => {
     if (projectId) {
       fetchTesters(projectId);
       fetchSprints();
-      // Fetch sprint details by agile_id
-      fetchSprintDetailsFromApi(projectId);
+      fetchSprintDetailsFromApi();
       getUserIdFromToken();
       const storedScreamId = sessionStorage.getItem('scrumId');  // Fetch screamId from session storage
       if (storedScreamId) {
@@ -73,57 +72,57 @@ const CreateSprint = () => {
     }
   }, [projectId]);
 
-
-  const fetchSprintDetailsFromApi = async (agile_id) => {
+  const fetchSprintDetailsFromApi = async () => {
     try {
       const accessToken = sessionStorage.getItem('access_token');
-      const response = await axios.get(`http://localhost:5000/sprint_details/${agile_id}`, {
+      const scrumId = sessionStorage.getItem('scrumId'); // Get scrumId from session storage
+      
+      if (!scrumId) {
+        console.error('No scrumId found in session storage');
+        return;
+      }
+  
+      const response = await axios.get(`https://h25ggll0-5000.inc1.devtunnels.ms/sprint_details/${scrumId}`, {
         headers: {
           'Authorization': `Bearer ${accessToken}`,
         }
       });
-      setSprints(response.data);  // Set the sprint details in state
+      setSprints(response.data);
       
     } catch (error) {
       console.error('Error fetching sprint details:', error);
     }
   };
 
-  // Fetch testers from the API
   const fetchTesters = async (projectId) => {
     try {
       const accessToken = sessionStorage.getItem('access_token');
-      const response = await axios.get(`http://localhost:5000/tester_name_by_project/${projectId}`, {
+      const response = await axios.get(`https://h25ggll0-5000.inc1.devtunnels.ms/tester_name_by_project/${projectId}`, {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${accessToken}`,
         }
       });
       setTesters(response.data);
-      console.log("TESTER NAME ID : ", response.data[0].id)
-      // settesterid(response.data[0].id)
     } catch (error) {
       console.error('Error fetching testers:', error);
     }
   };
 
-  // Fetch all sprints from local storage
   const fetchSprints = () => {
     const storedSprints = JSON.parse(localStorage.getItem('sprints')) || [];
     setSprints(storedSprints);
   };
+
   const handleStoryChange = (index, e) => {
     const updatedStories = [...stories];
     updatedStories[index][e.target.name] = e.target.value;
-  
-    // If the field being updated is the tester select dropdown, map it to tester_id.
     if (e.target.name === "name") {
       updatedStories[index]["tester_id"] = e.target.value; // Store the tester_id here
     }
-  
     setStories(updatedStories);
   };
-  
+
   const getUserIdFromToken = () => {
     const accessToken = sessionStorage.getItem('access_token');
     if (accessToken) {
@@ -134,12 +133,6 @@ const CreateSprint = () => {
     }
     return null; // If no token is found, return null
   };
-  
-  // Add a new story
-  const handleAddStory = () => {
-    setStories([...stories, { storyName: '', name: '', storyPoint: '', status: '', completion: '', type: '', tester_id: ''}]);
-  };
-
 
   const handleSubmit = async () => {
     const story_committed = stories.length;
@@ -150,48 +143,71 @@ const CreateSprint = () => {
     const formattedStartDate = `${startDate}T00:00:00`;
     const formattedEndDate = `${endDate}T00:00:00`;
 
-    const sprintDetails = {
-      // sprint_id: selectedSprint.id,
-      ...(editMode && { sprint_id: selectedSprint.id }),
-      story_committed,
-      story_completed,
-      story_points_committed,
-      story_points_completed,
-      defect_open_critical: parseInt(defects.critical) || 0,
-      defect_open_high: parseInt(defects.high) || 0,
-      defect_open_medium: parseInt(defects.medium) || 0,
-      defect_open_low: parseInt(defects.low) || 0,
-      user_id: userId,
-      project_name_id: projectId, 
-      scream_id: screamId,
-      pi_name: piName, // Add PI name to the payload
-      start_date: formattedStartDate,
-      end_date: formattedEndDate,
-      sprint_name: sprintName,
-    };
-
     const newSprintDetails = {
+      // ...(editMode && { sprint_id: selectedSprint.id }),
+      // story_committed,
+      // story_completed,
+      // story_points_committed,
+      // story_points_completed,
+      // defect_open_critical: parseInt(defects.critical) || 0,
+      // defect_open_high: parseInt(defects.high) || 0,
+      // defect_open_medium: parseInt(defects.medium) || 0,
+      // defect_open_low: parseInt(defects.low) || 0,
+      // user_id: userId,
+      // project_name_id: projectId, 
+      // scream_id: screamId,
+      // pi_name: piName, // Add PI name to the payload
+      // start_date: formattedStartDate,
+      // end_date: formattedEndDate,
+      // sprint_name: sprintName,
+      // story_details: stories.map(story => ({
+      //   story_name: story.storyName,
+      //   story_point: story.storyPoint,
+      //   status: story.status,
+      //   completed_percentage: story.completion,
+      //   manual_or_automation: story.type || 'Manual', 
+      //   tester_id: story.tester_id, // The tester name ID
+      //   story_consumed: story.story_consumed || null,// Add story_consumed to payload
+      //   target_date: story.target_date || null,// Add story_consumed to payload
+      //   actual_hour: story.actual_hour || null,// Add story_consumed to payload
+      //   estimated_hour: story.estimated_hour || null,// Add story_consumed to payload
+      // }))
       sprint_details: {
-        ...sprintDetails,
+        ...(editMode && { sprint_id: selectedSprint.id }),
+        story_committed,
+        story_completed,
+        story_points_committed,
+        story_points_completed,
+        defect_open_critical: parseInt(defects.critical) || 0,
+        defect_open_high: parseInt(defects.high) || 0,
+        defect_open_medium: parseInt(defects.medium) || 0,
+        defect_open_low: parseInt(defects.low) || 0,
+        user_id: userId,
+        project_name_id: projectId,
         scream_id: screamId,
+        pi_name: piName,
+        start_date: formattedStartDate,
+        end_date: formattedEndDate,
+        sprint_name: sprintName,
       },
       story_details: stories.map(story => ({
-        id: story.id, // Make sure to include the ID for updating
         story_name: story.storyName,
         story_point: story.storyPoint,
         status: story.status,
         completed_percentage: story.completion,
-        manual_or_automation: story.type || 'Manual', 
-        tester_id: story.tester_id, // The tester name ID
-      }))
+        manual_or_automation: story.type || 'Manual',
+        tester_id: story.tester_id,
+        story_consumed: story.story_consumed || null,
+        target_date: story.target_date || null,
+        actual_hour: story.actual_hour || null,
+        estimated_hour: story.estimated_hour || null,
+      })),
     };
-
 
     try {
       const accessToken = sessionStorage.getItem('access_token');
       if (editMode) {
-        // PUT request to update sprint
-        const response = await axios.put('http://localhost:5000/update_sprint_story_put', newSprintDetails, {
+        const response = await axios.put('https://h25ggll0-5000.inc1.devtunnels.ms/update_sprint_story_put', newSprintDetails, {
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${accessToken}`,
@@ -200,8 +216,7 @@ const CreateSprint = () => {
         console.log('Sprint updated successfully:', response.data);
         setSprints(prevSprints => prevSprints.map(sprint => sprint.sprint_id === response.data.sprint_details.sprint_id ? response.data.sprint_details : sprint));
       } else {
-        // POST request to create new sprint
-        const response = await axios.post('http://localhost:5000/update_sprint_story', newSprintDetails, {
+        const response = await axios.post('https://h25ggll0-5000.inc1.devtunnels.ms/update_sprint_story', newSprintDetails, {
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${accessToken}`,
@@ -209,51 +224,44 @@ const CreateSprint = () => {
         });
         console.log('Sprint created successfully:', response.data);
         setSprints(prevSprints => [...prevSprints, response.data.sprint_details]);
-        
       }
-      setShowModal(false);
-      // window.location.reload()
+      window.alert("Sprint created successfully")
+      window.location.reload()
     } catch (error) {
       console.error('Error submitting sprint:', error);
     }
+    setShowModal(false);
   };
 
   const fetchSprintDetails = (index) => {
     setSelectedSprint(sprints[index]);
     setShowModal(true);
   };
+
   const handleDeleteSprint = async () => {
     const isconfirmed = window.confirm("Are you sure want to delete the sprint")
     if(!isconfirmed){
       return
     }
     try {
-      // Get the sprint ID from the selected sprint object
       const sprintId = selectedSprint.id;
-      console.log("selectedSprint : ", selectedSprint)
-  
-      // Make a DELETE request to the API to delete the sprint
       const accessToken = sessionStorage.getItem('access_token');
-      const response = await axios.delete(`http://localhost:5000/sprint_details/${sprintId}`, {
+      const response = await axios.delete(`https://h25ggll0-5000.inc1.devtunnels.ms/sprint_details/${sprintId}`, {
         headers: {
           'Authorization': `Bearer ${accessToken}`,
         },
       });
-  
-      // If the API call is successful, remove the sprint from the local state
-      if (response.status === 200) {
-        const updatedSprints = sprints.filter(sprint => sprint.sprint_id !== sprintId);
-        localStorage.setItem('sprints', JSON.stringify(updatedSprints));  // Update local storage as well
-        setSprints(updatedSprints);
-        setShowModal(false); // Close the modal after deletion
-        console.log('Sprint deleted successfully:', response.data);
-      }
+      const updatedSprints = sprints.filter(sprint => sprint.sprint_id !== sprintId);
+      localStorage.setItem('sprints', JSON.stringify(updatedSprints));  // Update local storage as well
+      setSprints(updatedSprints);
+      setShowModal(false); // Close the modal after deletion
+      console.log('Sprint deleted successfully:', response.data);
       window.location.reload()
     } catch (error) {
       console.error('Error deleting sprint:', error);
     }
   };
-  
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const year = date.getFullYear();
@@ -261,10 +269,9 @@ const CreateSprint = () => {
     const day = date.getDate().toString().padStart(2, '0'); // Add leading zero if day < 10
     return `${year}-${month}-${day}`;
   };
+
   const handleEditSprint = () => {
     setEditMode(true);
-  
-    // Set form fields with the current sprint details
     setStories(selectedSprint.story_details.map(story => ({
       ...story,
       id: story.id,  // Ensure the ID is included for updating
@@ -274,31 +281,26 @@ const CreateSprint = () => {
       status: story.status,
       completion: story.completed_percentage,
       type: story.manual_or_automation,
+      target_date: story.target_date || null,// Add story_consumed to payload
+      actual_hour: story.actual_hour || null,// Add story_consumed to payload
+      estimated_hour: story.estimated_hour || null,// Add story_consumed to payload
     })));
-  
-    // Set start and end dates
     setStartDate(formatDate(selectedSprint.start_date)); // Split to get the date part
-    // console.log("startDate : ", selectedSprint.start_date)
     setEndDate(formatDate(selectedSprint.end_date)); // Split to get the date part
     setSprintName(selectedSprint.sprint_name); // Set sprint name as well
-
-    // Set defect values
     setDefects({
       critical: selectedSprint.defect_open_critical || 0,
       high: selectedSprint.defect_open_high || 0,
       medium: selectedSprint.defect_open_medium || 0,
       low: selectedSprint.defect_open_low || 0
     });
-  
-    // Close the modal once the details are pre-filled
     setShowModal(true);
     closeModal(true);
   };
-  
 
   const closeModal = () => {
     setShowModal(false);
-    };
+  };
 
   const handleDefectChange = (e) => {
     const { name, value } = e.target;
@@ -308,18 +310,24 @@ const CreateSprint = () => {
     }));
   };
 
+  const handleAddStory = () => {
+    setStories([...stories, { storyName: '', name: '', storyPoint: '', status: '', completion: '', type: '', tester_id: '', story_consumed: null }]);
+  };
+
   return (
     <div style={{ width: '60%', margin: 'auto' }}>
       <Card>
         <Card.Header as="h5" style={{ backgroundColor: '#000d6b', color: '#ffffff', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           Create Sprint
-          {userRole === 'admin' &&<Button
-            variant="outline-light"
-            style={{ backgroundColor: 'transparent', borderColor: '#ffffff', color: '#ffffff' }}
-            onClick={() => setShowModal(true)}
-          >
-            View Sprint
-          </Button>}
+          {userRole === 'admin' && (
+            <Button
+              variant="outline-light"
+              style={{ backgroundColor: 'transparent', borderColor: '#ffffff', color: '#ffffff' }}
+              onClick={() => setShowModal(true)}
+            >
+              View Sprint
+            </Button>
+          )}
         </Card.Header>
 
         <Card.Body>
@@ -455,6 +463,57 @@ const CreateSprint = () => {
     </Form.Control>
   </Form.Group>
 </Col>
+<Col md={6}>
+  <Form.Group>
+    <Form.Label>Story Consumed</Form.Label>
+    <Form.Control
+      type="number"
+      name="story_consumed"
+      value={story.story_consumed}
+      onChange={(e) => handleStoryChange(index, e)}
+      placeholder="Enter story consumed"
+    />
+  </Form.Group>
+</Col>
+<Col md={6}>
+  <Form.Group>
+    <Form.Label>Target Date</Form.Label>
+    <Form.Control
+      type="date"
+      name="target_date"
+      value={story.target_date}
+      onChange={(e) => handleStoryChange(0, e)}
+      placeholder="Select target date"
+    />
+  </Form.Group>
+</Col>
+
+<Col md={6}>
+  <Form.Group>
+    <Form.Label>Actual Hours</Form.Label>
+    <Form.Control
+      type="number"
+      name="actual_hour"
+      value={story.actual_hour}
+      onChange={(e) => handleStoryChange(0, e)}
+      placeholder="Enter actual hours"
+    />
+  </Form.Group>
+</Col>
+
+<Col md={6}>
+  <Form.Group>
+    <Form.Label>Estimated Hours</Form.Label>
+    <Form.Control
+      type="number"
+      name="estimated_hour"
+      value={story.estimated_hour}
+      onChange={(e) => handleStoryChange(0, e)}
+      placeholder="Enter estimated hours"
+    />
+  </Form.Group>
+</Col>
+
 </Row>
 
                 <hr style={{ borderTop: '1px solid #000d6b', margin: '20px 0' }} />

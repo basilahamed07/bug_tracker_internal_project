@@ -26,6 +26,23 @@ def non_agile(app):
 
     
 
+    # @app.route('/testing-type/<int:project_name_id>', methods=['GET'])
+    # @jwt_required()
+    # def get_tester_type(project_name_id):
+    #     try:
+    #         # Get all testing types for the given project
+    #         testing_type = TestingType.query.filter_by(project_name_id=project_name_id).all()
+
+    #         if not testing_type:
+    #             return jsonify({'message': 'No testing type found for this project'}), 404
+
+    #         return jsonify([trash.to_dict() for trash in testing_type]), 200
+
+    #     except Exception as e:
+    #         # Handle unexpected errors
+    #         print(f"Error: {str(e)}")
+    #         return jsonify({'message': 'An unexpected error occurred.'}), 500
+
     @app.route('/testing-type/<int:project_name_id>', methods=['GET'])
     @jwt_required()
     def get_tester_type(project_name_id):
@@ -36,12 +53,22 @@ def non_agile(app):
             if not testing_type:
                 return jsonify({'message': 'No testing type found for this project'}), 404
 
-            return jsonify([trash.to_dict() for trash in testing_type]), 200
+            # Get the defect details for the given project
+            defect_data = Total_Defect_Status.query.filter_by(project_name_id=project_name_id).all()
+
+            # Prepare the response data
+            response_data = {
+                'testing_entries': [entry.to_dict() for entry in testing_type],
+                'defect_details': [defect.to_dict() for defect in defect_data]
+            }
+
+            return jsonify(response_data), 200
 
         except Exception as e:
             # Handle unexpected errors
             print(f"Error: {str(e)}")
             return jsonify({'message': 'An unexpected error occurred.'}), 500
+
 
 
     @app.route('/testing-type', methods=['POST'])

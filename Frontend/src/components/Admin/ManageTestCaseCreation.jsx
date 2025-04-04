@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Table, Form, Card, Row, Col, Modal } from 'react-bootstrap';
 import axios from 'axios';
-
+import BackButton from '../common/BackButton';
 import { useNavigate } from 'react-router-dom'; // Use useNavigate instead of useHistory
+import { getUserRoleFromToken } from '../../utils/tokenUtils';
+import { jwtDecode } from 'jwt-decode'; // Add this import
 
 
 const ManageTestCaseCreationStatus = () => {
@@ -40,6 +42,17 @@ const ManageTestCaseCreationStatus = () => {
 
 
   useEffect(() => {
+    const token = sessionStorage.getItem('access_token');
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        const role = decoded.sub === '1' || decoded.type === 'access' ? 'admin' : 'testlead';
+        console.log('Initial role:', role);
+        setUserRole(role);
+      } catch (error) {
+        console.error("Error decoding token:", error);
+      }
+    }
     fetchTestCaseStatuses();
     fetchUserProjects();  // Fetch projects when the component mounts
 
@@ -73,7 +86,7 @@ const ManageTestCaseCreationStatus = () => {
   const fetchTestCaseStatuses = async () => {
     const token = sessionStorage.getItem('access_token');
     try {
-      const response = await axios.get('http://localhost:5000/test_case_creation_status', {
+      const response = await axios.get('https://h25ggll0-5000.inc1.devtunnels.ms/test_case_creation_status', {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -88,7 +101,7 @@ const ManageTestCaseCreationStatus = () => {
   const fetchUserProjects = async () => {
     const token = sessionStorage.getItem('access_token');
     try {
-      const response = await axios.get('http://localhost:5000/get-user-projects', {
+      const response = await axios.get('https://h25ggll0-5000.inc1.devtunnels.ms/get-user-projects', {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -105,7 +118,7 @@ const ManageTestCaseCreationStatus = () => {
   const handleViewDefect = async (projectId) => {
     const token = sessionStorage.getItem('access_token');
     try {
-      const response = await axios.get(`http://localhost:5000/test_case_creation_status/${projectId}`, {
+      const response = await axios.get(`https://h25ggll0-5000.inc1.devtunnels.ms/test_case_creation_status/${projectId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -183,8 +196,8 @@ const ManageTestCaseCreationStatus = () => {
     const token = sessionStorage.getItem('access_token');
     const method = editingStatus ? 'PUT' : 'POST';
     const url = editingStatus
-      ? `http://localhost:5000/test_case_creation_status/${editingStatus.id}`
-      : 'http://localhost:5000/test_case_creation_status';
+      ? `https://h25ggll0-5000.inc1.devtunnels.ms/test_case_creation_status/${editingStatus.id}`
+      : 'https://h25ggll0-5000.inc1.devtunnels.ms/test_case_creation_status';
 
     try {
       const response = await axios({
@@ -232,27 +245,27 @@ const ManageTestCaseCreationStatus = () => {
       const endpoints = [
         {
           key: 'ManageBuildStatus',
-          url: 'http://localhost:5000/build_status'
+          url: 'https://h25ggll0-5000.inc1.devtunnels.ms/build_status'
         },
         {
           key: 'ManageDefectAcceptedRejected',
-          url: 'http://localhost:5000/defect_accepted_rejected'
+          url: 'https://h25ggll0-5000.inc1.devtunnels.ms/defect_accepted_rejected'
         },
         {
           key: 'ManageTestCaseCreation',
-          url: 'http://localhost:5000/test_case_creation_status'
+          url: 'https://h25ggll0-5000.inc1.devtunnels.ms/test_case_creation_status'
         },
         {
           key: 'ManageTestExecutionStatus',
-          url: 'http://localhost:5000/test_execution_status'
+          url: 'https://h25ggll0-5000.inc1.devtunnels.ms/test_execution_status'
         },
         {
           key: 'ManageTotalDefectStatuses',
-          url: 'http://localhost:5000/total_defect_status'
+          url: 'https://h25ggll0-5000.inc1.devtunnels.ms/total_defect_status'
         },
         {
           key: 'manageDefect',
-          url: 'http://localhost:5000/new_defects'
+          url: 'https://h25ggll0-5000.inc1.devtunnels.ms/new_defects'
         }
       ];
 
@@ -307,9 +320,14 @@ const ManageTestCaseCreationStatus = () => {
         });
 
         // Navigate after successful submission
-        setTimeout(() => {
+        const currentRole = getUserRoleFromToken();
+        console.log('Current role for navigation:', currentRole);
+
+        if (currentRole === 'admin') {
+          navigate('/AdminPanel/MatrixInput');
+        } else {
           navigate('/TestLead/MatrixInput');
-        }, 2000);
+        }
       } else {
         throw new Error('Some requests failed');
       }
@@ -327,7 +345,7 @@ const ManageTestCaseCreationStatus = () => {
     if (window.confirm('Are you sure you want to delete this status?')) {
       const token = sessionStorage.getItem('access_token');
       try {
-        const response = await axios.delete(`http://localhost:5000/test_case_creation_status/${id}`, {
+        const response = await axios.delete(`https://h25ggll0-5000.inc1.devtunnels.ms/test_case_creation_status/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -447,7 +465,14 @@ const ManageTestCaseCreationStatus = () => {
 
     // Navigate to the previous page (can be a specific path or use -1 for going back to the last visited page)
     // navigate('AdminPanel/ManageDefects'); // This will go back to the previous page
-    navigate(-1); // This will go back to the previous page
+    const currentRole = getUserRoleFromToken();
+    console.log('Current role for previous:', currentRole);
+
+    if (currentRole === 'admin') {
+      navigate('/AdminPanel/ManageDefectAcceptedRejected');
+    } else {
+      navigate('/TestLead/ManageDefectAcceptedRejected');
+    }
   };
 
 
@@ -455,31 +480,10 @@ const ManageTestCaseCreationStatus = () => {
     setShowPopup(false); // Close the popup without submitting
   };
 
-
-
-  // validation 
-
-  // const validateField = (name, value) => {
-  //   let error = '';
-  //   if (!value) {
-  //     error = `${name} is required.`;
-  //   }
-  //   return error;
-  // };
-
-  // const handleBlur = (e) => {
-  //   const { name, value } = e.target;
-  //   const error = validateField(name, value);
-  //   setErrors(prevErrors => ({
-  //     ...prevErrors,
-  //     [name]: error
-  //   }));
-  // };
-
-
   return (
     <div className="container mt-5">
-      <Card>
+      <BackButton /> 
+           <Card>
         <Card.Header
           as="h5"
           style={{

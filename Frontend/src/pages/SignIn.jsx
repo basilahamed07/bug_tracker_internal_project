@@ -2,22 +2,15 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-
-
 // SVG Imports
 import cponly from "../components/panel/assets/cponly.svg";
 
-
 const SlidingAuth = () => {
-  // const [isSignIn, setIsSignIn] = useState(true);
-
-  // State for form data
   const [signInData, setSignInData] = useState({
-    username: '',  // Only username and password are needed
+    username: '',
     password: '',
   });
 
-  // State for validation errors
   const [errors, setErrors] = useState({
     signIn: {},
   });
@@ -42,26 +35,21 @@ const SlidingAuth = () => {
     e.preventDefault();
     if (validateSignIn()) {
       try {
-        // Make the API call to log in
-        const response = await axios.post('http://localhost:5000/login', signInData);
+        const response = await axios.post('https://h25ggll0-5000.inc1.devtunnels.ms/login', signInData);
 
         if (response.status === 200) {
           const { access_token, user } = response.data;
 
-          // Store access token and username in sessionStorage
           sessionStorage.setItem('access_token', access_token);
           sessionStorage.setItem('username', user.username);
 
-          // Clear form data
           setSignInData({
             username: '',
             password: '',
           });
 
-          // Clear errors
           setErrors((prevErrors) => ({ ...prevErrors, signIn: {} }));
 
-          // Navigate based on the role in the response
           if (user.role === 'TestLead') {
             navigate('/TestLead/project-info');
           } else if (user.role === 'admin') {
@@ -84,8 +72,6 @@ const SlidingAuth = () => {
         }
       } catch (error) {
         if (error.response) {
-          console.error('Sign In Error:', error.response.data);
-
           if (error.response.status === 401) {
             setErrors((prevErrors) => ({
               ...prevErrors,
@@ -98,13 +84,11 @@ const SlidingAuth = () => {
             }));
           }
         } else if (error.request) {
-          console.error('Sign In Error: No response received', error.request);
           setErrors((prevErrors) => ({
             ...prevErrors,
             signIn: { general: 'No response received from the server.' },
           }));
         } else {
-          console.error('Sign In Error:', error.message);
           setErrors((prevErrors) => ({
             ...prevErrors,
             signIn: { general: error.message },
@@ -118,22 +102,23 @@ const SlidingAuth = () => {
     <div
       style={{
         fontFamily: "'Montserrat', sans-serif",
-        height: '100vh',  // Full viewport height
-        display: 'flex',  // Flexbox to center content
-        justifyContent: 'center',  // Center horizontally
-        alignItems: 'center',  // Center vertically
-        background: '#f6f5f7',  // Light background color
-        margin: 0,  // Remove default margin
+        height: '100vh',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        background: 'linear-gradient(to right, #000d6b, #00297a)', // Updated background gradient
+        margin: 0,
       }}
     >
       <div
         style={{
-          display: 'flex',  // Flexbox for both form and right banner side
-          width: '768px',  // Fixed width
-          height: '480px',  // Minimum height for the form and banner
+          display: 'flex',
+          width: '768px',
+          height: '480px',
           maxWidth: '100%',
           borderRadius: '10px',
           boxShadow: '0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22)',
+          backgroundColor: '#ffffff',  // White background for the form container
         }}
       >
         {/* Sign In Form */}
@@ -142,7 +127,7 @@ const SlidingAuth = () => {
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            width: '50%',  // Left side width
+            width: '50%',
             height: '100%',
             background: '#fff',
             padding: '20px',
@@ -191,7 +176,6 @@ const SlidingAuth = () => {
                 letterSpacing: '1px',
                 textTransform: 'uppercase',
                 marginTop: '20px',
-                // border: 'none',
               }}
             >
               Sign In
@@ -203,14 +187,14 @@ const SlidingAuth = () => {
         {/* Right Side Banner */}
         <div
           style={{
-            background: 'linear-gradient(to right, #000d6b, #00297a)',  // Gradient background
+            background: 'linear-gradient(to right, #000d6b, #00297a)',  // Matching gradient background
             backgroundRepeat: 'no-repeat',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
-            color: '#ffffff',  // White text color
+            color: '#ffffff',
             height: '100%',
-            width: '50%',  // Right side width
-            display: 'flex',  // Flexbox to center text
+            width: '50%',
+            display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
             alignItems: 'center',
@@ -218,14 +202,15 @@ const SlidingAuth = () => {
             padding: '20px',
           }}
         >
-        <img src={cponly} alt="Changepond Technologies" 
-        
-        style={{
-          width: '80%',  // Makes the image responsive
-          height: 'auto',  // Keeps the aspect ratio intact
-          marginBottom: '20px',
-        }}
-        />
+          <img
+            src={cponly}
+            alt="Changepond Technologies"
+            style={{
+              width: '80%',
+              height: 'auto',
+              marginBottom: '20px',
+            }}
+          />
           <h1>Digital Assurance</h1>
           <p>Platform Led Quality Engineering</p>
         </div>

@@ -5,7 +5,8 @@ import { FaEdit, FaTrashAlt } from 'react-icons/fa';
 import { Button, Table, Form, Card, Row, Col, Modal } from 'react-bootstrap';
 import axios from 'axios'; 
 import { useNavigate } from 'react-router-dom'; // Use useNavigate instead of useHistory
-
+import { getUserRoleFromToken } from '../../utils/tokenUtils';
+import BackButton from '../common/BackButton';
 
 const ManageDefects = () => {
   const [defects, setDefects] = useState([]);
@@ -26,30 +27,14 @@ const ManageDefects = () => {
   const [selectedProjectId, setSelectedProjectId] = useState(null); // Store selected project ID for viewing defects
   const [showTable, setShowTable] = useState(false); // State to control visibility of the table inside modal
   const [user_role, setUserRole] = useState(false);
-
-
-
-
   const [selectedProject, setSelectedProject] = useState(''); // Store selected project ID or name
   const [projectName, setProjectName] = useState(''); // Store project name from sessionStorage
   const [showCreateDetails, setShowCreateDetails] = useState(false); // Track whether to show create details
-
-
-
-
-
   const [showForm, setShowForm] = useState(true);
   const [loading, setLoading] = useState(false);
-
-
-
-
   const navigate = useNavigate(); // Initialize useNavigate for navigation
-
   useEffect(() => {
     fetchUserProjects(); // Fetch projects for the logged-in user
-
-
     // Check if there's data in localStorage for manageDefect
     const storedData = localStorage.getItem('manageDefect');
     if (storedData) {
@@ -76,20 +61,6 @@ const ManageDefects = () => {
     }
   }, []); // Run once when component mounts
 
-// const handleChange = (event) => {
-//   const { name, value } = event.target;
-//   setFormData((prevData) => {
-//     // If the field is 'date', store it in sessionStorage
-//     if (name === 'date') {
-//       sessionStorage.setItem('date', value); // Save the date to sessionStorage
-//     }
-//     return {
-//       ...prevData,
-//       [name]: value,
-//     };
-//   });
-// };
-
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormData((prevData) => {
@@ -109,7 +80,7 @@ const ManageDefects = () => {
   const fetchDefects = async (project_name_id) => {
     const token = sessionStorage.getItem('access_token');
     try {
-      const response = await axios.get(`http://localhost:5000/new_defects/${project_name_id}`, {
+      const response = await axios.get(`https://h25ggll0-5000.inc1.devtunnels.ms/new_defects/${project_name_id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -125,7 +96,7 @@ const ManageDefects = () => {
   const fetchUserProjects = async () => {
     const token = sessionStorage.getItem('access_token');
     try {
-      const response = await axios.get('http://localhost:5000/get-user-projects', {
+      const response = await axios.get('https://h25ggll0-5000.inc1.devtunnels.ms/get-user-projects', {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -165,8 +136,8 @@ const ManageDefects = () => {
     const token = sessionStorage.getItem('access_token');
     const method = editingDefect ? 'PUT' : 'POST';
     const url = editingDefect
-      ? `http://localhost:5000/new_defects/${editingDefect.id}`
-      : 'http://localhost:5000/new_defects';
+      ? `https://h25ggll0-5000.inc1.devtunnels.ms/new_defects/${editingDefect.id}`
+      : 'https://h25ggll0-5000.inc1.devtunnels.ms/new_defects';
 
     try {
       const response = await axios({
@@ -202,7 +173,7 @@ const ManageDefects = () => {
     if (window.confirm('Are you sure you want to delete this defect?')) {
       const token = sessionStorage.getItem('access_token');
       try {
-        const response = await axios.delete(`http://localhost:5000/new_defects/${id}`, {
+        const response = await axios.delete(`https://h25ggll0-5000.inc1.devtunnels.ms/new_defects/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -231,7 +202,7 @@ const ManageDefects = () => {
   const handleViewDefects = async (projectId) => {
     try {
       const token = sessionStorage.getItem('access_token');
-      const response = await axios.get(`http://localhost:5000/new_defects/${projectId}`, {
+      const response = await axios.get(`https://h25ggll0-5000.inc1.devtunnels.ms/new_defects/${projectId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -266,26 +237,25 @@ const ManageDefects = () => {
   };
 
   const handleNext = () => {
-    // Check if all required fields are filled
-    // const isValid = Object.values(formData).every(field => field !== '');
-    const isValid = validateForm()
+    // Check form validation
+    const isValid = validateForm();
     if (!isValid) {
-      // alert('Please fill all the fields before proceeding.');
       return;
     }
 
     // Store the form data in localStorage
     localStorage.setItem('manageDefect', JSON.stringify(formData));
 
-    // Navigate to the next component
-    navigate('/AdminPanel/ManageTestExecutionStatus');
-    // window.location.reload();
+    // Get user role and navigate accordingly
+    const currentRole = getUserRoleFromToken();
+    console.log('Current user role:', currentRole); // Debug log
+
+    if (currentRole === 'admin') {
+      navigate('/AdminPanel/ManageTestExecutionStatus');
+    } else {
+      navigate('/TestLead/ManageTestExecutionStatus');
+    }
   };
-
-
-
-
-
 
   const validateField = (name, value) => {
     let error = '';
@@ -309,6 +279,7 @@ const ManageDefects = () => {
   return (
 
     <div className="container mt-5">
+       <BackButton />
 
       {/* Create Project Status Form */}
 

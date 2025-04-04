@@ -9,7 +9,12 @@ const ManagerView = () => {
   const [showModal, setShowModal] = useState(false);
   const [modalContent, setModalContent] = useState({ title: '', content: '' });
   const [currentPage, setCurrentPage] = useState(1);
-  const [projectsPerPage] = useState(3);
+  const [projectsPerPage] = useState(9); // Change from 3 to 9
+  const [totalTesters, setTotalTesters] = useState({
+    total: 0,
+    billable: 0,
+    nonBillable: 0
+  });
   
   // Fetch project data
   useEffect(() => {
@@ -21,7 +26,7 @@ const ManagerView = () => {
   const fetchProjects = async () => {
     const token = sessionStorage.getItem('access_token');
     try {
-      const response = await fetch('http://localhost:5000/project-details-manager-view', {
+      const response = await fetch('https://h25ggll0-5000.inc1.devtunnels.ms/project-details-manager-view', {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -31,7 +36,17 @@ const ManagerView = () => {
       const data = await response.json();
       setProjects(data.project_details);
       setProjectName(data.project_name);
-      console.log("Fetched Data: ", data);
+
+      // Calculate totals from project_details
+      const totalBillable = data.project_details.reduce((acc, project) => acc + project.billable.length, 0);
+      const totalNonBillable = data.project_details.reduce((acc, project) => acc + project.nonbillable.length, 0);
+      
+      setTotalTesters({
+        total: totalBillable + totalNonBillable,
+        billable: totalBillable,
+        nonBillable: totalNonBillable
+      });
+
     } catch (error) {
       console.error('Error fetching projects:', error);
     }
@@ -41,7 +56,7 @@ const ManagerView = () => {
   const fetchAllTesters = async () => {
     const token = sessionStorage.getItem('access_token');
     try {
-      const response = await fetch('http://localhost:5000/tester_full_details', {
+      const response = await fetch('https://h25ggll0-5000.inc1.devtunnels.ms/tester_full_details', {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -56,6 +71,7 @@ const ManagerView = () => {
         projects: tester.projects
       }));
       setTesters(formattedTesters);
+
       console.log("Testers Data: ", formattedTesters);
     } catch (error) {
       console.error('Error fetching testers:', error);
@@ -193,16 +209,12 @@ const ManagerView = () => {
   return (
     <div className="container mt-5">
       {/* Title at the top */}
-      <Card className="mb-4">
-        <Card.Body>
-          <h2>Manager Dashboard</h2>
-        </Card.Body>
-      </Card>
-
+      
+      <center><h1>Quality Engineering Dashboard</h1></center><br></br>
       {/* Projects Table Card */}
       <Card className="mb-4">
         <Card.Header as="h5" style={{ backgroundColor: '#000d6b', color: '#ffffff', borderRadius: '10px 10px 0 0' }}>
-          Manager View
+        <center>Projects Status</center>
         </Card.Header>
         <Card.Body>
           <div className="table-responsive">
@@ -217,10 +229,10 @@ const ManagerView = () => {
                   <th>Billable</th>
                   <th>Nonbillable</th>
                   <th>Billing Type</th>
-                  <th>Automation?</th>
-                  <th>AI Used</th>
-                  <th>Project Metrics</th>
-                  <th>ai Inside</th>
+                  {/* <th>Automation?</th> */}
+                  {/* <th>AI Used</th> */}
+                  <th>Project Metrics TBD</th>
+                  {/* <th>ai insight</th> */}
                 </tr>
               </thead>
               <tbody>
@@ -248,18 +260,18 @@ const ManagerView = () => {
                     <td>{project.billable.length}</td>
                     <td>{project.nonbillable.length}</td>
                     <td>{project.billing_type || 'N/A'}</td>
-                    <td>{renderAutomation(project.automation, project.automation)}</td>
-                    <td>{renderAI(project.ai_used, project.ai_used)}</td>
+                    {/* <td>{renderAutomation(project.automation, project.automation)}</td> */}
+                    {/* <td>{renderAI(project.ai_used, project.ai_used)}</td> */}
                     <td>
                       <a href={`/ManagerView/project_metrics/${project.project_name_id}`} rel="noopener noreferrer">
                         View Metrics
                       </a>
                     </td>
-                    <td>
+                    {/* <td>
                       <a href={`/ManagerView/ai_insist/${project.project_name_id}`} rel="noopener noreferrer">
-                        AI Inside
+                        AI insight
                       </a>
-                    </td>
+                    </td> */}
                   </tr>
                 ))}
               </tbody>
@@ -267,55 +279,49 @@ const ManagerView = () => {
 
             {/* Simple totals display */}
             <div className="mt-3 ms-2">
-              <strong>Total Billable Resources:</strong> {' '}
-              <span className="text-success">
-                {projects.reduce((total, project) => total + project.billable.length, 0)}
-              </span>
-              {' | '}
-              <strong>Total Non-Billable Resources:</strong> {' '}
-              <span className="text-danger">
-                {projects.reduce((total, project) => total + project.nonbillable.length, 0)}
+              <strong>Total Testers:</strong> {' '}
+              <span className="text-primary">
+                {totalTesters.total} ({totalTesters.billable} billable / {totalTesters.nonBillable} non-billable)
               </span>
             </div>
             
             {/* Add Pagination Controls */}
-            <div className="d-flex justify-content-center mt-3">
-              <nav>
-                <ul className="pagination">
-                  <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                    <button
-                      className="page-link"
-                      onClick={() => handlePageChange(currentPage - 1)}
-                      disabled={currentPage === 1}
-                    >
-                      Previous
-                    </button>
-                  </li>
-                  {[...Array(totalPages)].map((_, index) => (
-                    <li key={index} className={`page-item ${currentPage === index + 1 ? 'active' : ''}`}>
+            {projects.length > 9 && (  // Only show pagination if more than 9 projects
+              <div className="d-flex justify-content-center mt-3">
+                <nav>
+                  <ul className="pagination">
+                    <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
                       <button
                         className="page-link"
-                        onClick={() => handlePageChange(index + 1)}
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
                       >
-                        {index + 1}
+                        Previous
                       </button>
                     </li>
-                  ))}
-                  <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-                    <button
-                      className="page-link"
-                      onClick={() => handlePageChange(currentPage + 1)}
-                      disabled={currentPage === totalPages}
-                    >
-                      Next
-                    </button>
-                  </li>
-                </ul>
-              </nav>
-            </div>
-
-            
-            
+                    {[...Array(totalPages)].map((_, index) => (
+                      <li key={index} className={`page-item ${currentPage === index + 1 ? 'active' : ''}`}>
+                        <button
+                          className="page-link"
+                          onClick={() => handlePageChange(index + 1)}
+                        >
+                          {index + 1}
+                        </button>
+                      </li>
+                    ))}
+                    <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                      <button
+                        className="page-link"
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                      >
+                        Next
+                      </button>
+                    </li>
+                  </ul>
+                </nav>
+              </div>
+          )}            
           </div>
         </Card.Body>
       </Card>

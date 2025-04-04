@@ -387,94 +387,6 @@ class AgileDetails(db.Model):
         }
 
 
-# old code
-
-
-
-# class SprintDetails(db.Model):
-#     __tablename__ = 'sprint_details'
-
-#     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-#     story_committed = db.Column(db.Integer, nullable=False)
-#     story_completed = db.Column(db.Integer, nullable=False)
-#     story_points_committed = db.Column(db.Integer, nullable=False)
-#     story_points_completed = db.Column(db.Integer, nullable=False)
-    
-#     # Defect severities
-#     defect_open_critical = db.Column(db.Integer, default=0)
-#     defect_open_high = db.Column(db.Integer, default=0)
-#     defect_open_medium = db.Column(db.Integer, default=0)
-#     defect_open_low = db.Column(db.Integer, default=0)
-
-#     # Foreign Key to StoryDetails
-#     story_details_id = db.Column(db.Integer, db.ForeignKey('story_details.id'), nullable=True)
-#     story_details = db.relationship('StoryDetails', backref='sprint_details', foreign_keys=[story_details_id], uselist=False)
-    
-#     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-#     user = db.relationship("Users", backref="sprint_details")
-    
-#     project_name_id = db.Column(db.Integer, db.ForeignKey("project_name.id"), nullable=False)
-#     project_name = db.relationship("Project_name", backref="sprint_details", foreign_keys=[project_name_id])
-
-#     # Agile details (foreign key reference to unique scream_name)
-#     scrume_name = db.Column(db.String(100), db.ForeignKey("agile_details.scream_name", ondelete="CASCADE"), nullable=False)
-#     agiledetails = db.relationship("AgileDetails", backref="sprint_details", passive_deletes=True)
-
-#     # Adding start_date and end_date columns
-#     start_date = db.Column(db.DateTime, nullable=False)
-#     end_date = db.Column(db.DateTime, nullable=False)
-
-#     def to_dict(self):
-#         return {
-#             'id': self.id,
-#             'story_committed': self.story_committed,
-#             'story_completed': self.story_completed,
-#             'story_points_committed': self.story_points_committed,
-#             'story_points_completed': self.story_points_completed,
-#             'defect_open_critical': self.defect_open_critical,
-#             'defect_open_high': self.defect_open_high,
-#             'defect_open_medium': self.defect_open_medium,
-#             'defect_open_low': self.defect_open_low,
-#             'story_details': self.story_details.to_dict() if self.story_details else None,
-#             'user_id': self.user_id,
-#             'project_name_id': self.project_name_id,
-#             'start_date': self.start_date,
-#             'end_date': self.end_date
-#         }
-
-# class StoryDetails(db.Model):
-#     __tablename__ = 'story_details'
-    
-#     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-#     story_name = db.Column(db.String(200), nullable=False)
-#     story_point = db.Column(db.Integer, nullable=False)
-#     status = db.Column(db.String(50), nullable=False, default="Incomplete")
-#     completed_percentage = db.Column(db.Float, nullable=False)
-#     manual_or_automation = db.Column(db.String(50), nullable=False, default="manual")
-    
-#     # Foreign key to link StoryDetails to Testers table
-#     tester_name_id = db.Column(db.Integer, db.ForeignKey("testers.id"), nullable=False)
-    
-#     # Add foreign_keys argument to specify which foreign key to use
-#     tester_name = db.relationship("Testers", backref="story_details", foreign_keys=[tester_name_id])
-
-#     # Relationship to SprintDetails
-#     sprint_detail_id = db.Column(db.Integer, db.ForeignKey("sprint_details.id"), nullable=True)  # Set to nullable=True to allow NULL initially
-    
-#     # Use a unique backref name to avoid conflict
-#     sprint_detail = db.relationship("SprintDetails", backref="story_details_ref", foreign_keys=[sprint_detail_id])
-
-#     def to_dict(self):
-#         return {
-#             'id': self.id,
-#             'story_name': self.story_name,
-#             'story_point': self.story_point,
-#             'status': self.status,
-#             'completed_percentage': self.completed_percentage,
-#             'manual_or_automation': self.manual_or_automation
-#         }
-
-
 # new code for ajesting the logics 
 class SprintDetails(db.Model):
     __tablename__ = 'sprint_details'
@@ -534,9 +446,14 @@ class StoryDetails(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     story_name = db.Column(db.String(200), nullable=False)
     story_point = db.Column(db.Integer, nullable=False)
+    story_consumed = db.Column(db.Integer, nullable=True)
     status = db.Column(db.String(50), nullable=False, default="Incomplete")
     completed_percentage = db.Column(db.Float, nullable=False)
     manual_or_automation = db.Column(db.String(50), nullable=False, default="manual")
+    target_date = db.Column(db.Date, nullable=True)
+    actual_hour = db.Column(db.Integer, nullable=True, default=0)  # Integer format
+    estimated_hour = db.Column(db.Integer, nullable=True, default=0)  # Integer format
+
     
     # Foreign key to link StoryDetails to Testers table
     tester_name_id = db.Column(db.Integer, db.ForeignKey("testers.id"), nullable=False)
@@ -556,9 +473,14 @@ class StoryDetails(db.Model):
             'story_name': self.story_name,
             'story_point': self.story_point,
             'status': self.status,
+            'tester_name': self.tester_name.tester_name.tester_name,
+            'Story_consumed': self.story_consumed,
             'completed_percentage': self.completed_percentage,
             'manual_or_automation': self.manual_or_automation,
-            "tester_id":self.tester_name_id
+            "tester_id":self.tester_name_id,
+            "target_date":self.target_date,
+            "actual_hour":self.actual_hour,
+            "estimated_hour":self.estimated_hour
         }
 
 

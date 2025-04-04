@@ -4,8 +4,9 @@ import React, { useState, useEffect } from 'react';
 import { FaEdit, FaTrashAlt } from 'react-icons/fa';
 import { Button, Table, Form, Card, Row, Col, Modal } from 'react-bootstrap';
 import axios from 'axios';
-
+import BackButton from '../common/BackButton';
 import { useNavigate } from 'react-router-dom'; // Use useNavigate instead of useHistory
+import { getUserRoleFromToken } from '../../utils/tokenUtils'; // Import getUserRoleFromToken
  
 
 const ManageDefectAcceptedRejected = () => {
@@ -78,7 +79,7 @@ const ManageDefectAcceptedRejected = () => {
     
     const token = sessionStorage.getItem('access_token');
     try {
-      const response = await axios.get(`http://localhost:5000/defect_accepted_rejected/${projectId}`, {
+      const response = await axios.get(`https://h25ggll0-5000.inc1.devtunnels.ms/defect_accepted_rejected/${projectId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -93,7 +94,7 @@ const ManageDefectAcceptedRejected = () => {
   const fetchUserProjects = async () => {
     const token = sessionStorage.getItem('access_token');
     try {
-      const response = await axios.get('http://localhost:5000/get-user-projects', {
+      const response = await axios.get('https://h25ggll0-5000.inc1.devtunnels.ms/get-user-projects', {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -114,7 +115,7 @@ const ManageDefectAcceptedRejected = () => {
   const fetchDefectsForProject = async (projectId) => {
     const token = sessionStorage.getItem('access_token');
     try {
-      const response = await axios.get(`http://localhost:5000/defect_accepted_rejected/${projectId}`, {
+      const response = await axios.get(`https://h25ggll0-5000.inc1.devtunnels.ms/defect_accepted_rejected/${projectId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -178,8 +179,8 @@ const ManageDefectAcceptedRejected = () => {
     const token = sessionStorage.getItem('access_token');
     const method = editingStatus ? 'PUT' : 'POST';
     const url = editingStatus
-      ? `http://localhost:5000/defect_accepted_rejected/${editingStatus.id}`
-      : 'http://localhost:5000/defect_accepted_rejected';
+      ? `https://h25ggll0-5000.inc1.devtunnels.ms/defect_accepted_rejected/${editingStatus.id}`
+      : 'https://h25ggll0-5000.inc1.devtunnels.ms/defect_accepted_rejected';
 
     try {
       const response = await axios({
@@ -214,7 +215,7 @@ const ManageDefectAcceptedRejected = () => {
     if (window.confirm('Are you sure you want to delete this status?')) {
       const token = sessionStorage.getItem('access_token');
       try {
-        const response = await axios.delete(`http://localhost:5000/defect_accepted_rejected/${id}`, {
+        const response = await axios.delete(`https://h25ggll0-5000.inc1.devtunnels.ms/defect_accepted_rejected/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -275,9 +276,7 @@ const ManageDefectAcceptedRejected = () => {
   };
 
   const handleNext = () => {
-    // Check if all required fields are filled
-    // const isValid = Object.values(formData).every(field => field !== '');
-    const isValid = validateForm()
+    const isValid = validateForm();
     if (!isValid) {
       alert('Please fill all the fields before proceeding.');
       return;
@@ -286,83 +285,33 @@ const ManageDefectAcceptedRejected = () => {
     // Store the form data in localStorage
     localStorage.setItem('ManageDefectAcceptedRejected', JSON.stringify(formData));
 
-    // Navigate to the next component
-    navigate('/AdminPanel/ManageTestCaseCreationStatus');
+    // Get user role and navigate accordingly
+    const currentRole = getUserRoleFromToken();
+    console.log('Current user role:', currentRole); // Debug log
+
+    if (currentRole === 'admin') {
+      navigate('/AdminPanel/ManageTestCaseCreationStatus');
+    } else {
+      navigate('/TestLead/ManageTestCaseCreationStatus');
+    }
   };
 
-
-  // This function will be triggered when the "Go to Previous" button is clicked
-  // const handlePrevious = () => {
-  //   // Fetch the form data from localStorage
-  //   const savedData = JSON.parse(localStorage.getItem('ManageBuildStatus'));
-
-  //   if (savedData) {
-  //     setFormData(savedData); // Restore the form data from localStorage
-  //   } else {
-  //     console.log('No data found in localStorage.');
-  //   }
-
-  //   // Navigate to the previous page (can be a specific path or use -1 for going back to the last visited page)
-  //   // navigate('AdminPanel/ManageDefects'); // This will go back to the previous page
-  //   navigate(-1); // This will go back to the previous page
-  // };
-
-  // const handleNext = async () => {
-  //   const isValid = validateForm();
-  //   if (!isValid) {
-  //     return;
-  //   }
-  
-  //   try {
-  //     // First, submit the form data
-  //     const token = sessionStorage.getItem('access_token');
-  //     const projectId = sessionStorage.getItem('project_name_id');
-      
-  //     const response = await axios({
-  //       method: 'POST',
-  //       url: 'http://localhost:5000/defect_accepted_rejected',
-  //       headers: {
-  //         Authorization: `Bearer ${token}`,
-  //         'Content-Type': 'application/json'
-  //       },
-  //       data: {
-  //         ...formData,
-  //         project_name_id: projectId
-  //       }
-  //     });
-  
-  //     if (response.status === 200 || response.status === 201) {
-  //       // Store the form data in localStorage
-  //       localStorage.setItem('ManageDefectAcceptedRejected', JSON.stringify(formData));
-        
-  //       // Navigate to the next component
-  //       navigate('/AdminPanel/ManageTestCaseCreationStatus', { replace: true });
-  //     } else {
-  //       alert('Failed to save data. Please try again.');
-  //     }
-  //   } catch (error) {
-  //     console.error('Error saving data:', error);
-  //     alert('An error occurred while saving data.');
-  //   }
-  // };
-
-  // This function will be triggered when the "Go to Previous" button is clicked
   const handlePrevious = () => {
-    // Fetch the form data from localStorage
     const savedData = JSON.parse(localStorage.getItem('ManageBuildStatus'));
-
     if (savedData) {
-      setFormData(savedData); // Restore the form data from localStorage
-    } else {
-      console.log('No data found in localStorage.');
+      setFormData(savedData);
     }
 
-    // Navigate to the previous page (can be a specific path or use -1 for going back to the last visited page)
-    // navigate('AdminPanel/ManageDefects'); // This will go back to the previous page
-    navigate(-1); // This will go back to the previous page
+    // Get user role and navigate accordingly
+    const currentRole = getUserRoleFromToken();
+    console.log('Current user role for previous:', currentRole); // Debug log
+
+    if (currentRole === 'admin') {
+      navigate('/AdminPanel/ManageBuildStatus');
+    } else {
+      navigate('/TestLead/ManageBuildStatus');
+    }
   };
-
-
 
   // validation 
 
@@ -387,6 +336,7 @@ const ManageDefectAcceptedRejected = () => {
 
   return (
     <div className="container mt-5">
+      <BackButton />
       <Card>
         <Card.Header
           as="h5"

@@ -20,7 +20,7 @@ const Dashboard = () => {
   useEffect(() => {
     if (projectId) {
       // Fetch data from backend using the dynamic projectId from URL
-      axios.get(`http://localhost:5000/ai_insight/${projectId}`)
+      axios.get(`https://h25ggll0-5000.inc1.devtunnels.ms/ai_insight/${projectId}`)
         .then(response => {
           console.log(response.data); // Check the structure of the response
           const { summary, matrix } = response.data;

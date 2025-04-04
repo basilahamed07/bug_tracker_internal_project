@@ -124,17 +124,21 @@ def sprint_api(app):
             db.session.add(new_sprint)
             db.session.commit()  # Commit to get the ID assigned to the new sprint
 
-            # Loop through each story_detail and create StoryDetails
+            # Update the story creation part
             created_stories = []
             for story in story_data:
                 new_story = StoryDetails(
                     story_name=story['story_name'],
                     story_point=story['story_point'],
+                    story_consumed=story.get('story_consumed'),  # Changed from Story_consumed and added .get()
                     status=story['status'],
                     completed_percentage=story['completed_percentage'],
                     manual_or_automation=story['manual_or_automation'],
                     tester_name_id=story['tester_id'],
-                    sprint_detail_id=new_sprint.id  # Link the StoryDetails to the created SprintDetails
+                    sprint_detail_id=new_sprint.id,
+                    target_date=story['target_date'],
+                    actual_hour=story['actual_hour'],
+                    estimated_hour=story['estimated_hour']
                 )
 
                 # Add new StoryDetails to the database
@@ -223,11 +227,16 @@ def sprint_api(app):
                 # Update StoryDetails fields
                 story_detail.story_name = story['story_name']
                 story_detail.story_point = story['story_point']
+                story_detail.story_consumed = story['story_consumed']
                 story_detail.status = story['status']
                 story_detail.completed_percentage = story['completed_percentage']
                 story_detail.manual_or_automation = story['manual_or_automation']
                 story_detail.tester_name_id = story['tester_id']
-                story_detail.sprint_detail_id = sprint.id  # Ensure this is correctly linked to the updated sprint
+                story_detail.sprint_detail_id = sprint.id  
+                story_detail.target_date=story['target_date'],
+                story_detail.actual_hour=story['actual_hour'],
+                story_detail.estimated_hour=story['estimated_hour']
+                # Ensure this is correctly linked to the updated sprint
                 # Commit the updated StoryDetails to the database
                 db.session.commit()
     
@@ -310,4 +319,15 @@ def sprint_api(app):
         except Exception as e:
             db.session.rollback()
             return jsonify({"error": str(e)}), 400
+
+    @app.route('/get_scrum_name/<int:scrum_id>', methods=['GET'])
+    @jwt_required()
+    def get_scrum_name(scrum_id):
+        try:
+            scrum = Scrum.query.get(scrum_id)  # Replace Scrum with your actual model name
+            if not scrum:
+                return jsonify({"message": "Scrum not found"}), 404
+            return jsonify({"scream_name": scrum.scream_name}), 200
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
 

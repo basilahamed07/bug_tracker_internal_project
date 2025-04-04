@@ -68,7 +68,7 @@ const ViewMatrix = () => {
             return;
           }
     
-          let apiUrl = `http://localhost:5000/view_matrix_month_chart/${id}`;
+          let apiUrl = `https://h25ggll0-5000.inc1.devtunnels.ms/view_matrix_month_chart/${id}`;
     
           const response = await axios.post(apiUrl, { month: getCurrentMonthName() }, {
             headers: {
@@ -116,9 +116,9 @@ const ViewMatrix = () => {
 
       let apiUrl = '';
       if (reportType === 'month') {
-        apiUrl = `http://localhost:5000/view_matrix_month_chart/${id}`;
+        apiUrl = `https://h25ggll0-5000.inc1.devtunnels.ms/view_matrix_month_chart/${id}`;
       } else if (reportType === 'week') {
-        apiUrl = `http://localhost:5000/view_matrix_week/${id}`;
+        apiUrl = `https://h25ggll0-5000.inc1.devtunnels.ms/view_matrix_week/${id}`;
       }
 
       const response = await axios.post(apiUrl, { month: selectedMonth }, {

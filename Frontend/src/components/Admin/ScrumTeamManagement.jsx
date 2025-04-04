@@ -96,7 +96,7 @@ useEffect(() => {
       }
 
       try {
-        const response = await axios.get('http://localhost:5000/get-user-projects', {
+        const response = await axios.get('https://h25ggll0-5000.inc1.devtunnels.ms/get-user-projects', {
           headers: { Authorization: `Bearer ${token}` }
         });
 
@@ -132,7 +132,7 @@ useEffect(() => {
           return;
         }
     
-        const response = await axios.get(`http://localhost:5000/tester_name_by_project/${projectId}`, {
+        const response = await axios.get(`https://h25ggll0-5000.inc1.devtunnels.ms/tester_name_by_project/${projectId}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -373,7 +373,7 @@ useEffect(() => {
       if (selectedTeam !== null) {
         // Loop through each member and fetch their details
         for (let member of storedMembers) {
-          const response = await fetch(`http://localhost:5000/agile_details/${member.testerNameId}`, {
+          const response = await fetch(`https://h25ggll0-5000.inc1.devtunnels.ms/agile_details/${member.testerNameId}`, {
             method: 'GET',
             headers: {
               'Authorization': `Bearer ${sessionStorage.getItem('access_token')}`,
@@ -410,8 +410,8 @@ useEffect(() => {
   
       // API URL & Method (depending on PUT or POST)
       const apiUrl = selectedTeam !== null
-        ? 'http://localhost:5000/agile_details_put'
-        : 'http://localhost:5000/agile_details_post';
+        ? 'https://h25ggll0-5000.inc1.devtunnels.ms/agile_details_put'
+        : 'https://h25ggll0-5000.inc1.devtunnels.ms/agile_details_post';
       
       const method = selectedTeam !== null ? 'PUT' : 'POST';
   

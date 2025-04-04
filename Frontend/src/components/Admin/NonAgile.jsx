@@ -25,7 +25,7 @@ const NonAgile = () => {
       try {
         // Fetch Manual Testing data
         const manualResponse = await fetch(
-          `http://localhost:5000/testing-type/manual/latest/${project_name_id}`,
+          `https://h25ggll0-5000.inc1.devtunnels.ms/testing-type/manual/latest/${project_name_id}`,
           {
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -44,7 +44,7 @@ const NonAgile = () => {
     
         // Fetch Automation Testing data
         const automationResponse = await fetch(
-          `http://localhost:5000/testing-type/automation/latest/${project_name_id}`,
+          `https://h25ggll0-5000.inc1.devtunnels.ms/testing-type/automation/latest/${project_name_id}`,
           {
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -63,7 +63,7 @@ const NonAgile = () => {
     
         // Fetch Open Defact data
         const openDefactResponse = await fetch(
-          `http://localhost:5000/open_defact/${project_name_id}`,
+          `https://h25ggll0-5000.inc1.devtunnels.ms/open_defact/${project_name_id}`,
           {
             headers: {
               'Authorization': `Bearer ${token}`,
